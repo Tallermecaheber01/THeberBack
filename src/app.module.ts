@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RegistroController } from './public/registro/registro/registro.controller';
-import { RegistroModule } from './public/registro/registro/registro.module';
-import { LoginModule } from './public/login/login/login.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { usuarios } from './public/registro/registro/entities/registro-entity';
+import { UsersModule } from './users/users.module';
+import { User } from './users/entity/user.entity';
+import { ClientService } from './client/client.service';
+import { ClientModule } from './client/client.module';
+import { Feedback } from './users/entity/feedback.entity';
 
 @Module({
   imports: [
@@ -16,11 +17,12 @@ import { usuarios } from './public/registro/registro/entities/registro-entity';
       username: 'root', // tu usuario
       password: '', // tu contraseña
       database: 'servicio_automotriz', // nombre de la base de datos
-      entities: [usuarios], // incluye las entidades que quieres usar
+      entities: [User,Feedback], // Asegúrate de incluir la entidad aquí
       synchronize: true, // sincróniza las tablas (solo para desarrollo)
     }),
-    RegistroModule, LoginModule],
-  controllers: [AppController, RegistroController],
-  providers: [AppService],
+    UsersModule,
+    ClientModule,],
+  controllers: [AppController],
+  providers: [AppService, ClientService],
 })
 export class AppModule {}
