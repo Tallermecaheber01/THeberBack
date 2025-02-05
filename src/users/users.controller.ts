@@ -24,7 +24,7 @@ export class UsersController {
     //Endpoint para enviar el codigo de verificacion al correo del usuario
     @Post('register/send-code')
     async sendVerificationCode2(@Body('correo') email:string):Promise<string>{
-        return this.registroService.sendVerificationCode(email);
+        return this.registroService.sendVerificationCode2(email);
     }
 
     //Endopont para verificar el codigo recibido por el usuario

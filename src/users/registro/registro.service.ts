@@ -27,17 +27,19 @@ export class RegistroService {
 
   async sendVerificationCode(correo: string): Promise<string> {
     console.log('Correo recibido', correo);
-    
+
     // Verificar que el correo no esté vacío
     if (!correo || typeof correo !== 'string' || correo.trim() === '') {
       throw new Error('El correo proporcionado no es valido');
     }
 
     // Verificar si el correo ya está en uso en la base de datos
-    /*const existingUser = await this.userRepository.findOne({ where: { correo } });
+    const existingUser = await this.userRepository.findOne({ where: { correo } });
     if (existingUser) {
       throw new Error('El correo ya está registrado en la base de datos');
-    }*/
+    }
+
+
     // Generar un nuevo código de verificación
     const verificationCode = randomInt(100000, 999999).toString();
 
@@ -51,14 +53,109 @@ export class RegistroService {
     await this.transporter.sendMail({
       from: 'tallermecanicoheber@gmail.com', // El remitente
       to: correo.trim(), // El correo del destinatario
-      subject: 'Código de verificación para recuperar tu contraseña',
+      subject: 'Código de verificación para registrarte',
+      html: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Titulo del correo</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f7f7f7;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    border: 1px solid #0056b3;
+                    border-radius: 8px;
+                    background-color: #ffffff;
+                }
+                h2 {
+                    color: #0056b3;
+                }
+                p {
+                    color: #333;
+                }
+                .code {
+                    color: #e0a800; /* Color amarillo oscuro */
+                    font-weight: bold;
+                    font-size: 20px;
+                }
+                .image-container {
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                img {
+                    width: 150px;
+                    height: auto;
+                    max-width: 100%;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="image-container">
+                    <img src="https://taller-backend-two.vercel.app/images/latest" alt="Logo" />
+                </div>
+                <h2>Titulo</h2>
+                <p>Saludo</p>
+                <p>Tu código de recuperación es: <span class="code">${verificationCode}</span>.</p>
+                <p>Este código expirará en 10 minutos.</p>
+                <p>Despedida}</p>
+            </div>
+        </body>
+        </html>
+    `,
+      //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
+    });
+    console.log('correo enviado')
+
+    return 'Correo con código de verificación enviado';
+  }
+
+
+
+  async sendVerificationCode2(correo: string): Promise<string> {
+    console.log('Correo recibido', correo);
+
+    // Verificar que el correo no esté vacío
+    if (!correo || typeof correo !== 'string' || correo.trim() === '') {
+      throw new Error('El correo proporcionado no es valido');
+    }
+
+    // Verificar si el correo ya está en uso en la base de datos
+    const existingUser = await this.userRepository.findOne({ where: { correo } });
+    if (existingUser) {
+      throw new Error('El correo ya está registrado en la base de datos');
+    }
+
+
+    // Generar un nuevo código de verificación
+    const verificationCode = randomInt(100000, 999999).toString();
+
+    // Establecer la expiración del código (10 minutos)
+    const expiresAt = moment().add(10, 'minutes');
+
+    // Almacenar el código y su fecha de expiración en memoria
+    this.verificationCodes.set(correo, { code: verificationCode, expiresAt });
+
+    // Enviar el correo
+    await this.transporter.sendMail({
+      from: 'tallermecanicoheber@gmail.com', // El remitente
+      to: correo.trim(), // El correo del destinatario
+      subject: 'Código de verificación para registrarte',
       text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
     });
     console.log('correo enviado')
 
     return 'Correo con código de verificación enviado';
-}
-
+  }
 
   async verifyCode(email: string, code: string): Promise<string> {
 

@@ -52,7 +52,66 @@ export class RecoverPasswordService {
             from: 'tallermecanicoheber@gmail.com', // El remitente
             to: correo.trim(), // El correo del destinatario
             subject: 'Código de verificación para recuperar tu contraseña',
-            text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
+            html: `
+              <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titulo del correo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #0056b3;
+            border-radius: 8px;
+            background-color: #ffffff;
+        }
+        h2 {
+            color: #0056b3;
+        }
+        p {
+            color: #333;
+        }
+        .code {
+            color: #e0a800; /* Color amarillo oscuro */
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        img {
+            width: 250px;  /* Imagen más grande */
+            height: auto;
+            max-width: 100%; /* Evita desbordes en pantallas pequeñas */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="https://taller-backend-two.vercel.app/images/latest" alt="Logo" />
+        </div>
+        <h2>Titulo</h2>
+        <p>Saludo</p>
+        <p>Tu código de recuperación es: <span class="code">${verificationCode}</span>.</p>
+        <p>Este código expirará en 10 minutos.</p>
+        <p>Despedida</p>
+    </div>
+</body>
+</html>
+
+          `,
+            //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
         });
         return 'Correo con codigo de verifiacion enviado';
     }
