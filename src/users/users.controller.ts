@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { RegistroService } from './registro/registro.service';
 import { User } from './entity/user.entity';
 import { LoginDto } from './login/login.dto';
@@ -6,6 +6,7 @@ import { LoginService } from './login/login.service';
 import { RecoverPasswordService } from './recover-password/recover-password.service';
 import { FeedbackService } from './feedback/feedback.service';
 import { CreateFeedbackDto } from './feedback/feedback.dto';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -36,8 +37,8 @@ export class UsersController {
  
 
     @Post('login')
-    async login(@Body() loginDto: LoginDto){
-        return this.loginService.login(loginDto);
+    async login(@Body() loginDto: LoginDto, @Res() res:Response){
+        return this.loginService.login(loginDto, res);
     }
 
     //Endpoint para enviar el codigo de verificacion al correo del usuario

@@ -119,8 +119,6 @@ export class RegistroService {
     return 'Correo con código de verificación enviado';
   }
 
-
-
   async sendVerificationCode2(correo: string): Promise<string> {
     console.log('Correo recibido', correo);
 

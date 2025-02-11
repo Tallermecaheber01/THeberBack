@@ -8,7 +8,7 @@ async function bootstrap() {
   // Habilitar CORS solo para el origen especificado
   app.enableCors({
     origin: 'http://localhost:3001', // Asegúrate de especificar tu frontend
-    methods: 'GET, POST, PUT, DELETE', // Métodos permitidos
+    methods: 'GET, POST, PUT, DELETE,OPTIONS', // Métodos permitidos
     allowedHeaders: 'Content-Type, Authorization', // Cabeceras permitidas
     credentials: true, // Permitir enviar cookies
   });
