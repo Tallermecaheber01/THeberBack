@@ -4,10 +4,10 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entity/user.entity';
-import { ClientService } from './client/client.service';
 import { ClientModule } from './client/client.module';
 import { Feedback } from './users/entity/feedback.entity';
-
+import { AdminModule } from './admin/admin.module';
+import { ServiceEntity } from './admin/service/service.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,12 +17,13 @@ import { Feedback } from './users/entity/feedback.entity';
       username: 'root', // tu usuario
       password: '', // tu contraseña
       database: 'servicio_automotriz', // nombre de la base de datos
-      entities: [User,Feedback], // Asegúrate de incluir la entidad aquí
+      entities: [User,Feedback,ServiceEntity], // Asegúrate de incluir la entidad aquí
       synchronize: true, // sincróniza las tablas (solo para desarrollo)
     }),
     UsersModule,
-    ClientModule,],
+    ClientModule,
+    AdminModule,],
   controllers: [AppController],
-  providers: [AppService, ClientService],
+  providers: [AppService],
 })
 export class AppModule {}
