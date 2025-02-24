@@ -3,11 +3,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entity/user.entity';
+
+//Modulos
 import { ClientModule } from './client/client.module';
-import { Feedback } from './users/entity/feedback.entity';
 import { AdminModule } from './admin/admin.module';
-import { ServiceEntity } from './admin/service/service.entity';
+
+//Entities
+import { ServiceEntity } from './admin/service/entities/service.entity';
+import { BrandEntity } from './admin/service/entities/brand.entity';
+import { VehicleEntity } from './admin/service/entities/vehicle.entity';
+import { Feedback } from './users/entity/feedback.entity';
+import { User } from './users/entity/user.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,8 +24,8 @@ import { ServiceEntity } from './admin/service/service.entity';
       username: 'root', // tu usuario
       password: '', // tu contraseña
       database: 'servicio_automotriz', // nombre de la base de datos
-      entities: [User,Feedback,ServiceEntity], // Asegúrate de incluir la entidad aquí
-      synchronize: true, // sincróniza las tablas (solo para desarrollo)
+      entities: [User,Feedback,ServiceEntity,BrandEntity,VehicleEntity], // Asegúrate de incluir la entidad aquí
+      synchronize: false, // sincróniza las tablas (solo para desarrollo)
     }),
     UsersModule,
     ClientModule,
