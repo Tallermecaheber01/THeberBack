@@ -12,10 +12,10 @@ export class ServiceEntity {
     descripcion: string;
 
     @Column("json")
-    tipoVehiculo: number[]; // Aquí se guardará el array de números
+    tipoVehiculo: string[]; // Aquí se guardará el array de números
 
     @Column("json") // Usamos simple-array para guardar arrays
-    marcas: number[];
+    marcas: string[];
 
     @Column()
     imagen: string;

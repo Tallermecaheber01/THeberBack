@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsUrl, IsArray, ArrayNotEmpty, IsOptional, IsInt } from 'class-validator';
+import { IsString, IsOptional, IsUrl, IsArray, ArrayNotEmpty } from 'class-validator';
 
 export class UpdateServiceDto {
     @IsString()
@@ -11,13 +11,14 @@ export class UpdateServiceDto {
 
     @IsArray()
     @ArrayNotEmpty()
-    @IsInt({ each: true }) // Validamos que cada elemento sea un entero
-    tipoVehiculo?: number[]; // El array de enteros que representará el tipo de vehículo
+    @IsString({ each: true }) // Validamos que cada elemento sea una cadena
+    @IsOptional()
+    tipoVehiculo?: string[]; // Ahora es un array de strings
 
     @IsArray()
     @IsOptional()
-    @IsInt({ each: true }) // Cada elemento debe ser un string
-    marcas?: number[];
+    @IsString({ each: true }) // Validamos que cada elemento sea una cadena
+    marcas?: string[]; // Ahora es un array de strings
 
     @IsUrl()
     @IsOptional()
