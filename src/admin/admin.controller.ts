@@ -67,6 +67,11 @@ export class AdminController {
         return this.serviceService.getAllservices();
     }
 
+    @Get('service/:id')
+    async getServiceById(@Param('id', ParseIntPipe) id: number):Promise<ServiceEntity[]>{
+        return this.serviceService.getServiceById(id);
+    }
+
     @Get('all-brands')
     async getAllBrands(): Promise<BrandEntity[]> {
         return this.serviceService.getAllBrands();

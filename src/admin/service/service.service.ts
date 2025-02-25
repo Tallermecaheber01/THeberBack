@@ -72,7 +72,16 @@ export class ServiceService {
 
     async getAllservices(): Promise<ServiceEntity[]> {
         return this.serviceRepository.find();
+
     }
+    async getServiceById(id: number): Promise<ServiceEntity[]> {
+        const service = await this.serviceRepository.find({ where: { id } });
+        if (!service) {
+            throw new NotFoundException(`Servicio con ID ${id} no encontrado`);
+        }
+        return service;
+    }
+
 
     async getAllBrands(): Promise<BrandEntity[]> {
         return this.brandRepository.find();
@@ -94,28 +103,5 @@ export class ServiceService {
         await this.vehicleRepository.delete(id);
     }
 
-    async getAllServicesWithNames(): Promise<any[]> {
-        const services = await this.serviceRepository.createQueryBuilder('service')
-            .leftJoinAndSelect('service.tipoVehiculo', 'vehicleType')  // Unimos tipos de vehículos
-            .leftJoinAndSelect('service.marca', 'brand')  // Unimos marcas
-            .select([
-                'service.id',
-                'service.nombre',
-                'service.descripcion',
-                'service.imagen',
-                'vehicleType.nombre',  // Seleccionamos los nombres de tipos de vehículos
-                'brand.nombre'  // Seleccionamos los nombres de marcas
-            ])
-            .getRawMany();  // Usamos getRawMany para obtener los resultados
-    
-        // Transformamos la respuesta para agrupar los tipos de vehículos y marcas en arrays
-        return services.map(service => ({
-            service_id: service.service_id,
-            service_name: service.service_name,
-            service_description: service.service_description,
-            service_image: service.service_image,
-            tipoVehiculoNombres: service.vehicleType_nombre ? [service.vehicleType_nombre] : [], // Crear un array si existe
-            marcaNombres: service.brand_nombre ? [service.brand_nombre] : [] // Crear un array si existe
-        }));
-    }
+
 }

@@ -7,11 +7,13 @@ import { UsersModule } from './users/users.module';
 //Modulos
 import { ClientModule } from './client/client.module';
 import { AdminModule } from './admin/admin.module';
+import { EmployModule } from './employ/employ.module';
 
 //Entities
 import { ServiceEntity } from './admin/service/entities/service.entity';
 import { BrandEntity } from './admin/service/entities/brand.entity';
 import { VehicleEntity } from './admin/service/entities/vehicle.entity';
+import { AppointmentEntity } from './employ/appointment/entities/appointment.entity';
 import { Feedback } from './users/entity/feedback.entity';
 import { User } from './users/entity/user.entity';
 
@@ -24,12 +26,15 @@ import { User } from './users/entity/user.entity';
       username: 'root', // tu usuario
       password: '', // tu contraseña
       database: 'servicio_automotriz', // nombre de la base de datos
-      entities: [User,Feedback,ServiceEntity,BrandEntity,VehicleEntity], // Asegúrate de incluir la entidad aquí
+      entities: [User,Feedback,ServiceEntity,BrandEntity,VehicleEntity,
+        AppointmentEntity
+      ], // Asegúrate de incluir la entidad aquí
       synchronize: false, // sincróniza las tablas (solo para desarrollo)
     }),
     UsersModule,
     ClientModule,
-    AdminModule,],
+    AdminModule,
+    EmployModule,],
   controllers: [AppController],
   providers: [AppService],
 })
