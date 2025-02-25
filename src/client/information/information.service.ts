@@ -22,4 +22,19 @@ export class InformationService {
 
     return user;
   }
+  
+  // Método para obtener solo el rol de un usuario por ID
+  async getUserRoleById(id: number): Promise<string | null> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['rol'], // Solo seleccionamos el campo 'role'
+    });
+
+    if (!user) {
+      // Si el usuario no existe, lanzamos una excepción
+      throw new Error('Usuario no encontrado');
+    }
+
+    return user.rol; // Retorna solo el rol
+  }
 }
