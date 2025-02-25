@@ -23,4 +23,7 @@ export class User {
 
   @Column({ type: 'varchar', length: 255 })
   contrasena: string;  // Campo para 'contraseña'
+
+  @Column({type:'varchar', length:20, default:'client'})
+  rol: string;
 }
