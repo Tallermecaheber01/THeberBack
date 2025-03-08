@@ -38,13 +38,11 @@ export class LoginService {
     const payload = { userId: user.id, email: user.correo };
     const token = this.jwtService.sign(payload);
 
-    //Guardar el token en una cookie segura
+
     res.cookie('authToken', token, {
-      //httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',  // Solo en HTTPS
-      maxAge: 1000 * 60 * 60, // 1 hora de duración para el token
-      //maxAge: 1000 * 60 * 5, // 5 minutos de duración para el token
-      path: '/', // Asegúrate de que la cookie esté accesible en todas las rutas
+      secure: process.env.NODE_ENV === 'production', 
+      maxAge: 1000 * 60 * 60, 
+      path: '/', 
     });
     
     return res.json({ message: 'Login exitoso' });

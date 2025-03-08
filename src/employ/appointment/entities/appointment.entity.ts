@@ -1,5 +1,6 @@
 import { IsDate, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { AppointmentServiceEntity } from "./appointment-services";
 
 @Entity('appointment')
 export class AppointmentEntity {
@@ -22,15 +23,6 @@ export class AppointmentEntity {
     @IsString()  // Puede ser un string, ya que la hora se guarda como texto
     hora: string;
   
-    @Column({ type: 'varchar', length: 255 })
-    @IsString()
-    nombreServicio: string;
-  
-    @Column({ type: 'decimal', precision: 10, scale: 2 })
-    @IsNumber()
-    @IsPositive()  // Validación para que el costo sea positivo
-    costoServicio: number;
-  
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
     @IsOptional()  // Opcional
     @IsNumber()
@@ -40,4 +32,7 @@ export class AppointmentEntity {
     @IsNumber()
     @IsPositive()  // Validación para que el total sea positivo
     total: number;
+
+    @OneToMany(() => AppointmentServiceEntity, (service) => service.idCita, { cascade: true })
+    services: AppointmentServiceEntity[];  // Aquí debe ser un arreglo de AppointmentServiceEntity
 }

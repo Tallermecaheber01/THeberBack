@@ -4,9 +4,16 @@ import { EmployController } from './employ.controller';
 import { AppointmentService } from './appointment/appointment.service';
 
 import { AppointmentEntity } from './appointment/entities/appointment.entity';
+import { AppointmentServiceEntity } from './appointment/entities/appointment-services';
+import { AppointmentServicesViewEntity } from './entities/appointment_services_view';
+import { User } from 'src/users/entity/user.entity';
+import { UserVehicleViewEntity } from './entities/user-vehicle.view.entity';
+import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AppointmentEntity])],
+  imports: [TypeOrmModule.forFeature([AppointmentEntity,User,UserVehicleViewEntity,ServiceEntity,
+    AppointmentServiceEntity,AppointmentServicesViewEntity
+  ])],
   controllers: [EmployController],
   providers: [AppointmentService],
   exports:[AppointmentService]

@@ -22,7 +22,7 @@ export class CreateAppointmentDto {
 
     @IsOptional()
     @IsNumber()
-    costoExtra: number;
+    costoExtra?: number;
 
     @IsNumber()
     @IsPositive()

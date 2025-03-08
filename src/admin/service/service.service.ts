@@ -4,7 +4,7 @@ import { getRepository, Repository } from 'typeorm';
 
 import { ServiceEntity } from './entities/service.entity';
 import { BrandEntity } from './entities/brand.entity';
-import { VehicleEntity } from './entities/vehicle.entity';
+import { VehicleTypeEntity } from './entities/vehicle.entity';
 
 import { CreateServiceDto } from './dto/create-service.dto';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -24,8 +24,8 @@ export class ServiceService {
         @InjectRepository(BrandEntity)
         private readonly brandRepository: Repository<BrandEntity>,
 
-        @InjectRepository(VehicleEntity)
-        private readonly vehicleRepository: Repository<VehicleEntity>
+        @InjectRepository(VehicleTypeEntity)
+        private readonly vehicleRepository: Repository<VehicleTypeEntity>
     ) { }
 
     async createService(serviceData: CreateServiceDto): Promise<ServiceEntity> {
@@ -38,7 +38,7 @@ export class ServiceService {
         return this.brandRepository.save(newBrand);
     }
 
-    async createVehicleType(vehicleData: CreateVehicleDto): Promise<VehicleEntity> {
+    async createVehicleType(vehicleData: CreateVehicleDto): Promise<VehicleTypeEntity> {
         const newVehicleType = this.vehicleRepository.create(vehicleData);
         return this.vehicleRepository.save(newVehicleType);
     }
@@ -61,7 +61,7 @@ export class ServiceService {
         return this.brandRepository.save(brand);
     }
 
-    async updateVehicleType(id: number, updateData: UpdateVehicleDto): Promise<VehicleEntity> {
+    async updateVehicleType(id: number, updateData: UpdateVehicleDto): Promise<VehicleTypeEntity> {
         const vehicle = await this.vehicleRepository.findOne({ where: { id } });
         if (!vehicle) {
             throw new NotFoundException(`Tipo de vehículo con ID ${id} no encontrado`);
@@ -87,7 +87,7 @@ export class ServiceService {
         return this.brandRepository.find();
     }
 
-    async getAllVehicleTypes(): Promise<VehicleEntity[]> {
+    async getAllVehicleTypes(): Promise<VehicleTypeEntity[]> {
         return this.vehicleRepository.find();
     }
 

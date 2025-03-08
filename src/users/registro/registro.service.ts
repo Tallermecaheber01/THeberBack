@@ -26,7 +26,6 @@ export class RegistroService {
   });
 
   async sendVerificationCode(correo: string): Promise<string> {
-    console.log('Correo recibido', correo);
 
     // Verificar que el correo no esté vacío
     if (!correo || typeof correo !== 'string' || correo.trim() === '') {
@@ -114,13 +113,12 @@ export class RegistroService {
     `,
       //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
     });
-    console.log('correo enviado')
 
     return 'Correo con código de verificación enviado';
   }
 
   async sendVerificationCode2(correo: string): Promise<string> {
-    console.log('Correo recibido', correo);
+  
 
     // Verificar que el correo no esté vacío
     if (!correo || typeof correo !== 'string' || correo.trim() === '') {
@@ -150,7 +148,6 @@ export class RegistroService {
       subject: 'Código de verificación para registrarte',
       text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
     });
-    console.log('correo enviado')
 
     return 'Correo con código de verificación enviado';
   }
@@ -159,9 +156,8 @@ export class RegistroService {
 
     //verificar si el codigo es correcto o ya expiro
     const storedData = this.verificationCodes.get(email);
-    console.log(storedData);
     if (!storedData) {
-      console.log('Aqui en el if stored pasa el error')
+   
       throw new Error('No se encontró un código de verificación para este correo');
     }
 
@@ -178,7 +174,6 @@ export class RegistroService {
 
     // El código es válido, eliminamos el código de la memoria
     this.verificationCodes.delete(email);
-    console.log('codigo verificado')
     return 'Código verificado correctamente';
   }
 
@@ -226,7 +221,6 @@ export class RegistroService {
       const regex = new RegExp(`^${hashSuffix}:`, 'm');
       return regex.test(data);
     } catch (error) {
-      console.error('Error al verificar la contraseña en PwnedPasswords:', error);
       throw new Error('Hubo un error al verificar la contraseña. Intenta nuevamente.');
     }
   }

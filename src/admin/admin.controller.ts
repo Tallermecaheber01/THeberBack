@@ -12,7 +12,7 @@ import { UpdateVehicleDto } from './service/dto/update-vehicle.dto';
 
 import { ServiceEntity } from './service/entities/service.entity';
 import { BrandEntity } from './service/entities/brand.entity';
-import { VehicleEntity } from './service/entities/vehicle.entity';
+import { VehicleTypeEntity } from './service/entities/vehicle.entity';
 
 
 @Controller('admin')
@@ -34,7 +34,7 @@ export class AdminController {
 
     @Post('new-vehicletype')
     async createVehicleType(
-        @Body(new ValidationPipe) vehicleData: CreateVehicleDto): Promise<VehicleEntity> {
+        @Body(new ValidationPipe) vehicleData: CreateVehicleDto): Promise<VehicleTypeEntity> {
         return this.serviceService.createVehicleType(vehicleData);
     }
 
@@ -58,7 +58,7 @@ export class AdminController {
     async updateVehicleType(
         @Param('id', ParseIntPipe) id: number,
         @Body(new ValidationPipe()) updateData: UpdateVehicleDto
-    ): Promise<VehicleEntity> {
+    ): Promise<VehicleTypeEntity> {
         return this.serviceService.updateVehicleType(id, updateData);
     }
 
@@ -78,7 +78,7 @@ export class AdminController {
     }
 
     @Get('all-vehicletypes')
-    async getAllVehicleTypes(): Promise<VehicleEntity[]> {
+    async getAllVehicleTypes(): Promise<VehicleTypeEntity[]> {
         return this.serviceService.getAllVehicleTypes();
     }
 

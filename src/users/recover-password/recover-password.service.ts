@@ -26,11 +26,6 @@ export class RecoverPasswordService {
     });
 
     async sendVerificationCode(correo: string): Promise<string> {
-        console.log('Correo recibido', correo);
-        //Verificar que el correo no este vacio
-        /*if(!correo || typeof correo !== 'string' || correo.trim() === ''){
-            throw new Error('El correo proporcionado no es valido puto');
-        }*/
 
         //Buscar al usuario por su correo en la base de datos
         const user = await this.userRepository.findOne({ where: { correo } });

@@ -1,6 +1,6 @@
 // src/users/user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
 @Entity('users')  // Esto indica que esta entidad corresponde a la tabla 'users'
 export class User {
   @PrimaryGeneratedColumn()
@@ -26,4 +26,6 @@ export class User {
 
   @Column({type:'varchar', length:20, default:'client'})
   rol: string;
+  @OneToMany(()=> VehicleEntity, vehicle => vehicle.idPropietario)
+  vehiculos: VehicleEntity[];
 }
