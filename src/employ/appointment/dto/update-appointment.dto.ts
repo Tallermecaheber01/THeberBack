@@ -34,4 +34,10 @@ export class UpdateAppointmentDto {
     @IsNumber()
     @IsPositive()
     total?: number;
+
+    @IsString()
+    marca?: string;
+
+    @IsString()
+    modelo?: string;
 }

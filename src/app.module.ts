@@ -16,10 +16,10 @@ import { BrandEntity } from './admin/service/entities/brand.entity';
 import { VehicleTypeEntity } from './admin/service/entities/vehicle.entity';
 import { AppointmentEntity } from './employ/appointment/entities/appointment.entity';
 import { AppointmentServiceEntity } from './employ/appointment/entities/appointment-services';
-import { AppointmentServicesViewEntity } from './employ/entities/appointment_services_view';
+import { AppointmentServicesViewEntity } from './employ/entities-view/appointment_services_view';
 import { Feedback } from './users/entity/feedback.entity';
 import { User } from './users/entity/user.entity';
-import { UserVehicleViewEntity } from './employ/entities/user-vehicle.view.entity';
+import { UserVehicleViewEntity } from './employ/entities-view/user-vehicle.view.entity';
 import { VehicleEntity } from './client/vehicles/entities/vehicle.entity';
 import { PublicModule } from './public/public.module';
 

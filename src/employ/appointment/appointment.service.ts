@@ -5,8 +5,8 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 
 import { AppointmentEntity } from './entities/appointment.entity';
 import { AppointmentServiceEntity } from './entities/appointment-services';
-import { AppointmentServicesViewEntity } from '../entities/appointment_services_view';
-import { UserVehicleViewEntity } from '../entities/user-vehicle.view.entity';
+import { AppointmentServicesViewEntity } from '../entities-view/appointment_services_view';
+import { UserVehicleViewEntity } from '../entities-view/user-vehicle.view.entity';
 import { User } from 'src/users/entity/user.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { CreateAppointmentServiceDto } from './dto/create-appointment-service.dto';
@@ -44,7 +44,9 @@ export class AppointmentService {
             fecha: appointmentData.fecha,
             hora: appointmentData.hora,
             costoExtra: appointmentData.costoExtra ?? null,  // Si no viene, asigna null
-            total: appointmentData.total
+            total: appointmentData.total,
+            marca: appointmentData.marca,
+            modelo: appointmentData.modelo
         };
 
         const newAppointment = this.appointmentRepository.create(appointmentValues);
@@ -89,6 +91,8 @@ export class AppointmentService {
                     hora: curr.hora,
                     total: curr.total,
                     costoExtra: curr.costoExtra,
+                    marca:curr.marca,
+                    modelo: curr.modelo,
                     services: [],
                 };
             }

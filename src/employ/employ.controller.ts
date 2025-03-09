@@ -14,7 +14,6 @@ export class EmployController {
     async createAppointment(
         @Body() data: { appointment: CreateAppointmentDto, services: CreateAppointmentServiceDto[] }
     ): Promise<any> {
-        console.log('hola:', data)
         const { appointment, services } = data;
 
         // Llamamos al servicio para crear la cita y los servicios
@@ -31,7 +30,7 @@ export class EmployController {
     }
 
     // Endpoint para obtener citas con servicios
-    @Get('with-services')
+    @Get('appointments/full')
     async getAppointmentsWithServices() {
         const appointments = await this.appointmentService.getAppointmentsWithServices();
         return appointments;

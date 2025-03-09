@@ -28,4 +28,10 @@ export class AppointmentServicesViewEntity {
 
     @Column()
     costo: number;
+
+    @Column()
+    marca: string;
+
+    @Column()
+    modelo: string;
 }
