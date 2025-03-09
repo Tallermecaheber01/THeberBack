@@ -47,4 +47,4 @@ export class LoginService {
     
     return res.json({ message: 'Login exitoso' });
   }
-}
+} 

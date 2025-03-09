@@ -17,6 +17,9 @@ export class ServiceEntity {
     @Column("json") // Usamos simple-array para guardar arrays
     marcas: string[];
 
+    @Column("json")
+    modelos: string[];
+
     @Column()
     imagen: string;
 }
