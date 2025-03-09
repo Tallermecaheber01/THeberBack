@@ -93,6 +93,7 @@ export class AppointmentService {
                     costoExtra: curr.costoExtra,
                     marca: curr.marca,
                     modelo: curr.modelo,
+                    estado: curr.estado,
                     services: [],
                 };
             }
@@ -234,6 +235,7 @@ export class AppointmentService {
             costoExtra: appointment.costoExtra,
             marca: appointment.marca,
             modelo: appointment.modelo,
+            estado: appointment.estado,
             services: []
         };
 

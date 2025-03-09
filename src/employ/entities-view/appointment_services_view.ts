@@ -34,4 +34,7 @@ export class AppointmentServicesViewEntity {
 
     @Column()
     modelo: string;
+
+    @Column()
+    estado: string;
 }
