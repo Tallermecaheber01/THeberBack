@@ -30,11 +30,12 @@ export class EmployController {
     }
 
     // Endpoint para obtener citas con servicios
-    @Get('appointments/full')
-    async getAppointmentsWithServices() {
-        const appointments = await this.appointmentService.getAppointmentsWithServices();
+    @Get('appointments/full/:id')
+    async getAppointmentsWithServices(@Param('id') idData: number) {
+        const appointments = await this.appointmentService.getAppointmentsWithServices(idData);
         return appointments;
     }
+
 
     @Get('employees')
     async getAllEmployees() {

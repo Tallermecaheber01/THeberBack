@@ -75,11 +75,24 @@ export class AppointmentService {
         };
     }
 
-    // Función para obtener todas las citas con sus servicios
-    async getAppointmentsWithServices(): Promise<any> {
-        const appointments = await this.appointmentServicesViewRepository.find();
-
-        // Agrupar por appointment_id
+    async getAppointmentsWithServices(idData: number): Promise<any> {
+        // Obtener el nombre del empleado por su ID
+        const employ = await this.userRepository.findOne({
+            where: { id: idData, rol: 'empleado' }, // Asegúrate de que el rol sea 'empleado'
+            select: ['nombre']
+        });
+    
+        // Si no encontramos el empleado, devolver un error o mensaje
+        if (!employ) {
+            throw new Error("Empleado no encontrado");
+        }
+    
+        // Obtener las citas filtradas por el nombre del empleado
+        const appointments = await this.appointmentServicesViewRepository.find({
+            where: { nombreEmpleado: employ.nombre }  // Filtramos por el nombre del empleado
+        });
+    
+        // Agrupar las citas por appointment_id
         const groupedAppointments = appointments.reduce((acc, curr) => {
             // Si la cita ya existe en el acumulador, agregamos el servicio
             if (!acc[curr.appointment_id]) {
@@ -97,19 +110,20 @@ export class AppointmentService {
                     services: [],
                 };
             }
-
+    
             // Añadimos el servicio a la cita
             acc[curr.appointment_id].services.push({
                 servicio: curr.servicio,
                 costo: curr.costo,
             });
-
+    
             return acc;
         }, {});
-
-        // Convertir el objeto a un array de citas
+    
+        // Convertir el objeto a un array de citas y devolverlo
         return Object.values(groupedAppointments);
     }
+    
 
     //Método para obtener los usuarios con el rol 'client'
     async getAllUsersWithVehicles(): Promise<
@@ -129,7 +143,7 @@ export class AppointmentService {
     > {
         // Obtener todos los usuarios con rol 'client'
         const users = await this.userRepository.find({
-            where: { rol: 'client' },
+            where: { rol: 'cliente' },
             select: ['id', 'nombre']
         });
 
@@ -179,7 +193,7 @@ export class AppointmentService {
     async getAllEmployees() {
         // Obtener todos los usuarios con rol 'employ'
         const employees = await this.userRepository.find({
-            where: { rol: 'employ' },
+            where: { rol: 'empleado' },
             select: ['id', 'nombre']
         });
         return employees;
