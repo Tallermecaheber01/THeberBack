@@ -19,6 +19,11 @@ export class CreateServiceDto {
     @IsString({ each: true }) // Validamos que cada elemento sea una cadena
     marcas: string[]; // Ahora es un array de strings
 
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsString({ each: true }) // Validamos que cada elemento sea una cadena
+    modelos: string[]; // Ahora es un array de strings
+
     @IsUrl()
     imagen: string;
 }
