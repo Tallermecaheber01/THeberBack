@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { ClientModule } from './client/client.module';
 import { AdminModule } from './admin/admin.module';
 import { EmployModule } from './employ/employ.module';
+import { PublicModule } from './public/public.module';
 
 // Entities
 import { ServiceEntity } from './admin/service/entities/service.entity';
@@ -21,7 +22,7 @@ import { Feedback } from './users/entity/feedback.entity';
 import { User } from './users/entity/user.entity';
 import { UserVehicleViewEntity } from './employ/entities-view/user-vehicle.view.entity';
 import { VehicleEntity } from './client/vehicles/entities/vehicle.entity';
-import { PublicModule } from './public/public.module';
+import { RepairEntity } from './employ/repair/entities/repair.entity';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { PublicModule } from './public/public.module';
         entities: [
           User, Feedback, ServiceEntity, BrandEntity, VehicleTypeEntity,
           AppointmentEntity, UserVehicleViewEntity, VehicleEntity,AppointmentServiceEntity,
-          AppointmentServicesViewEntity
+          AppointmentServicesViewEntity,RepairEntity
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),

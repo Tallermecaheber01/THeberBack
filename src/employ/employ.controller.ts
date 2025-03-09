@@ -1,14 +1,20 @@
 import { Body, Controller, Get, Param, Post, ValidationPipe } from '@nestjs/common';
 
 import { AppointmentService } from './appointment/appointment.service';
+import { RepairService } from './repair/repair.service'; //se importa el servicio de reparacion para que pueda ser usado en el controlador
 
 import { CreateAppointmentDto } from './appointment/dto/create-appointment.dto';
 import { CreateAppointmentServiceDto } from './appointment/dto/create-appointment-service.dto';
-
+import { CreateRepairDto } from './repair/dto/create-repair.dto'; //Al igual que se vuelve a importar el dto
+import { RepairEntity } from './repair/entities/repair.entity';
 
 @Controller('employ')
 export class EmployController {
-    constructor(private readonly appointmentService: AppointmentService) { }
+    constructor(
+        private readonly appointmentService: AppointmentService,
+        private readonly repairService: RepairService //se crea el objeto del servicio
+    ) { }
+
 
     @Post('new-appointment')
     async createAppointment(
@@ -61,5 +67,16 @@ export class EmployController {
     @Get('appointment/:id')
     async getAppointmentById(@Param('id') appointmentId: number) {
         return this.appointmentService.getAppointmentById(appointmentId);
+    }
+
+
+
+    /**Aqui se utiliza la funcion del servicio de repair, de igual
+     * forma de usa el dto, para especificar los datos que se enviaran
+     */
+    @Post('new-repair')
+    async createRepair(
+        @Body() repairData: CreateRepairDto): Promise<RepairEntity> {
+        return this.repairService.createNewRepair(repairData);
     }
 }
