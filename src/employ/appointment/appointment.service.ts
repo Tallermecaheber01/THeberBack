@@ -36,7 +36,6 @@ export class AppointmentService {
     //Metodo para asignar una nueva cita
     async createNewAppointmentWithServices(appointmentData: CreateAppointmentDto, servicesData: CreateAppointmentServiceDto[]): Promise<any> {
         console.log('📩 Datos recibidos para la cita:', appointmentData);
-
         // Definir explícitamente las columnas en una constante
         const appointmentValues = {
             nombreCliente: appointmentData.nombreCliente,
@@ -46,7 +45,8 @@ export class AppointmentService {
             costoExtra: appointmentData.costoExtra ?? null,  // Si no viene, asigna null
             total: appointmentData.total,
             marca: appointmentData.marca,
-            modelo: appointmentData.modelo
+            modelo: appointmentData.modelo,
+            estado: 'Asignada'  // Estado inicial cuando el negocio asigna una cita
         };
 
         const newAppointment = this.appointmentRepository.create(appointmentValues);
@@ -91,7 +91,7 @@ export class AppointmentService {
                     hora: curr.hora,
                     total: curr.total,
                     costoExtra: curr.costoExtra,
-                    marca:curr.marca,
+                    marca: curr.marca,
                     modelo: curr.modelo,
                     services: [],
                 };
@@ -210,6 +210,48 @@ export class AppointmentService {
 
         console.log("Vehículo encontrado:", vehicle);
         return vehicle;
+    }
+
+    // Método para buscar una cita por ID
+    async getAppointmentById(appointmentId: number): Promise<any> {
+        // Buscar la cita por el ID de la cita
+        const appointment = await this.appointmentServicesViewRepository.findOne({
+            where: { appointment_id: appointmentId }
+        });
+
+        if (!appointment) {
+            throw new Error(`❌ Cita con ID ${appointmentId} no encontrada.`);
+        }
+
+        // Agrupar los servicios asociados a esa cita
+        const groupedAppointment = {
+            appointment_id: appointment.appointment_id,
+            nombreCliente: appointment.nombreCliente,
+            nombreEmpleado: appointment.nombreEmpleado,
+            fecha: appointment.fecha,
+            hora: appointment.hora,
+            total: appointment.total,
+            costoExtra: appointment.costoExtra,
+            marca: appointment.marca,
+            modelo: appointment.modelo,
+            services: []
+        };
+
+        // Buscar los servicios asociados a la cita
+        const services = await this.appointmentServicesViewRepository.find({
+            where: { appointment_id: appointmentId },
+            select: ['servicio', 'costo']
+        });
+
+        // Agregar los servicios a la cita
+        services.forEach(service => {
+            groupedAppointment.services.push({
+                servicio: service.servicio,
+                costo: service.costo
+            });
+        });
+
+        return groupedAppointment;
     }
 
 }

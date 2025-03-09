@@ -1,4 +1,5 @@
-import { IsDate, IsDateString, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
+import { IsDateString, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
+import { AppointmentStatus } from "../entities/appointment.entity";  // Importar el enum de estados
 
 export class CreateAppointmentDto {
     @IsString()
@@ -7,7 +8,7 @@ export class CreateAppointmentDto {
     @IsString()
     nombreEmpleado: string;
 
-    @IsDateString()  // Cambiar a @IsDateString para validar fechas en formato string
+    @IsDateString()  // Validación para fechas en formato string
     fecha: string;
 
     @IsString()
@@ -33,4 +34,8 @@ export class CreateAppointmentDto {
 
     @IsString()
     modelo: string;
+
+    @IsEnum(AppointmentStatus)
+    @IsOptional()  // Opcional, pero por defecto será "Asignada"
+    estado?: AppointmentStatus = AppointmentStatus.ASSIGNED;
 }

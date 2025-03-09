@@ -1,6 +1,18 @@
-import { IsDate, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
+import { IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { AppointmentServiceEntity } from "./appointment-services";
+
+// Definir los posibles estados de la cita
+export enum AppointmentStatus {
+    PENDING = "En espera",
+    CONFIRMED = "Confirmada",
+    CHANGE_PENDING = "Pendiente de cambio",
+    RESCHEDULED = "Reprogramada",
+    REJECTED = "Rechazada",
+    CANCELED = "Cancelada",
+    ASSIGNED = "Asignada",
+    COMPLETED = "Finalizada"
+}
 
 @Entity('appointment')
 export class AppointmentEntity {
@@ -20,17 +32,17 @@ export class AppointmentEntity {
     fecha: string;
 
     @Column({ type: 'time' })
-    @IsString()  // Puede ser un string, ya que la hora se guarda como texto
+    @IsString()
     hora: string;
 
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-    @IsOptional()  // Opcional
+    @IsOptional()
     @IsNumber()
     costoExtra: number;
 
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     @IsNumber()
-    @IsPositive()  // Validación para que el total sea positivo
+    @IsPositive()
     total: number;
 
     @Column({ type: 'varchar', length: 100 })
@@ -41,6 +53,11 @@ export class AppointmentEntity {
     @IsString()
     modelo: string;
 
+    @Column({ type: 'varchar', length: 50 })
+    @IsString()
+    estado: string;
+
+
     @OneToMany(() => AppointmentServiceEntity, (service) => service.idCita, { cascade: true })
-    services: AppointmentServiceEntity[];  // Aquí debe ser un arreglo de AppointmentServiceEntity
+    services: AppointmentServiceEntity[];
 }

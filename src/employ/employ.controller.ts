@@ -55,4 +55,10 @@ export class EmployController {
     ) {
         return this.appointmentService.getVehicleByUserAndModel(userId, marca, modelo);
     }
+
+    // Nuevo endpoint para obtener una cita por ID
+    @Get('appointment/:id')
+    async getAppointmentById(@Param('id') appointmentId: number) {
+        return this.appointmentService.getAppointmentById(appointmentId);
+    }
 }
