@@ -1,6 +1,7 @@
 import { IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { AppointmentServiceEntity } from "./appointment-services";
+import { AppointmentCancellationEntity } from "./appointment-cancellation-entity";
 
 // Definir los posibles estados de la cita
 export enum AppointmentStatus {
@@ -60,4 +61,7 @@ export class AppointmentEntity {
 
     @OneToMany(() => AppointmentServiceEntity, (service) => service.idCita, { cascade: true })
     services: AppointmentServiceEntity[];
+
+    @OneToMany(() => AppointmentCancellationEntity, (cancellation) => cancellation.idCita)
+    cancellations: AppointmentCancellationEntity[];
 }

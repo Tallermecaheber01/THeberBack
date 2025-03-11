@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer'; // Importa nodemailer
 import { randomInt } from 'crypto';
 import * as crypto from 'crypto'; // Para el hash MD5
+import * as bcrypt from 'bcrypt'
 import * as moment from 'moment'
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
@@ -142,8 +143,9 @@ export class RecoverPasswordService {
             throw new Error('Usuario no encontrado');
         }
 
-        // Encriptar la nueva contraseña con MD5
-        const hashedPassword = crypto.createHash('md5').update(newPassword).digest('hex');
+        // Encriptar la nueva contraseña con bcrypt
+        const salt = await bcrypt.genSalt(10);  // Genera un "salt" de 10 rondas
+        const hashedPassword = await bcrypt.hash(newPassword, salt);  // Encripta la nueva contraseña
 
         // Actualizar la contraseña en la base de datos
         user.contrasena = hashedPassword;

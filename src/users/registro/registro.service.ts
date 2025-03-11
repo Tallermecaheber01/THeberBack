@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 import axios from 'axios';
 import * as nodemailer from 'nodemailer'; // Importa nodemailer
 import * as moment from 'moment'
@@ -118,7 +119,7 @@ export class RegistroService {
   }
 
   async sendVerificationCode2(correo: string): Promise<string> {
-  
+
 
     // Verificar que el correo no esté vacío
     if (!correo || typeof correo !== 'string' || correo.trim() === '') {
@@ -157,7 +158,7 @@ export class RegistroService {
     //verificar si el codigo es correcto o ya expiro
     const storedData = this.verificationCodes.get(email);
     if (!storedData) {
-   
+
       throw new Error('No se encontró un código de verificación para este correo');
     }
 
@@ -191,7 +192,7 @@ export class RegistroService {
     }
 
     // Encriptar la contraseña con MD5 si no ha sido comprometida
-    const encryptedPassword = this.encryptedPasswordWithMD5(contrasena);
+    const encryptedPassword = await this.encryptPasswordWithBcrypt(contrasena);
 
     // Sustituir la contraseña en los datos del usuario con la contraseña encriptada
     userData.contrasena = encryptedPassword;
@@ -225,8 +226,10 @@ export class RegistroService {
     }
   }
 
-  // Método para encriptar la contraseña con MD5
-  private encryptedPasswordWithMD5(password: string): string {
-    return crypto.createHash('md5').update(password).digest('hex');
+  //Metodo para encriptar la contrasela con bcrypt
+  private async encryptPasswordWithBcrypt(password: string): Promise<string> {
+    const saltRounds = 10;  // Número de rondas de salting
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
   }
 }

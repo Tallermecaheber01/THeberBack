@@ -12,6 +12,7 @@ import { EmployModule } from './employ/employ.module';
 import { PublicModule } from './public/public.module';
 
 // Entities
+import { LogEntity } from './log/entity/log.entity';
 import { ServiceEntity } from './admin/service/entities/service.entity';
 import { BrandEntity } from './admin/service/entities/brand.entity';
 import { VehicleTypeEntity } from './admin/service/entities/vehicle.entity';
@@ -23,6 +24,8 @@ import { User } from './users/entity/user.entity';
 import { UserVehicleViewEntity } from './employ/entities-view/user-vehicle.view.entity';
 import { VehicleEntity } from './client/vehicles/entities/vehicle.entity';
 import { RepairEntity } from './employ/repair/entities/repair.entity';
+import { AppointmentCancellationEntity } from './employ/appointment/entities/appointment-cancellation-entity';
+import { CancelledAppointmentsViewEntity } from './employ/entities-view/appointments_cancelled_view';
 
 @Module({
   imports: [
@@ -33,16 +36,17 @@ import { RepairEntity } from './employ/repair/entities/repair.entity';
       imports: [ConfigModule],  // Importamos ConfigModule
       inject: [ConfigService],  // Inyectamos ConfigService
       useFactory: async (configService: ConfigService) => ({
-        type: 'mysql', 
-        host: configService.get<string>('DB_HOST'), 
-        port: configService.get<number>('DB_PORT'),  
-        username: configService.get<string>('DB_USERNAME'), 
-        password: configService.get<string>('DB_PASSWORD'), 
-        database: configService.get<string>('DB_NAME'), 
+        type: 'mysql',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
         entities: [
           User, Feedback, ServiceEntity, BrandEntity, VehicleTypeEntity,
-          AppointmentEntity, UserVehicleViewEntity, VehicleEntity,AppointmentServiceEntity,
-          AppointmentServicesViewEntity,RepairEntity
+          AppointmentEntity, UserVehicleViewEntity, VehicleEntity, AppointmentServiceEntity,
+          AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
+          CancelledAppointmentsViewEntity,LogEntity
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),
@@ -56,4 +60,4 @@ import { RepairEntity } from './employ/repair/entities/repair.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

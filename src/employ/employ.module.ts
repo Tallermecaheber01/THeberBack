@@ -14,10 +14,13 @@ import { User } from 'src/users/entity/user.entity';
 import { UserVehicleViewEntity } from './entities-view/user-vehicle.view.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { RepairEntity } from './repair/entities/repair.entity';
+import { AppointmentCancellationEntity } from './appointment/entities/appointment-cancellation-entity';
+import { CancelledAppointmentsViewEntity } from './entities-view/appointments_cancelled_view';
 
 @Module({
   imports: [TypeOrmModule.forFeature([AppointmentEntity,User,UserVehicleViewEntity,ServiceEntity,
-    AppointmentServiceEntity,AppointmentServicesViewEntity,RepairEntity
+    AppointmentServiceEntity,AppointmentServicesViewEntity,RepairEntity, AppointmentCancellationEntity,
+    CancelledAppointmentsViewEntity
   ])],
   controllers: [EmployController],
   providers: [AppointmentService, RepairService],
