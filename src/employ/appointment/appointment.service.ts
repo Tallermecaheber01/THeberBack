@@ -9,6 +9,8 @@ import { CancelledAppointmentsViewEntity } from '../entities-view/appointments_c
 import { UserVehicleViewEntity } from '../entities-view/user-vehicle.view.entity';
 import { User } from 'src/users/entity/user.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
+import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';
+import { ClientEntity } from 'src/public/register/entity/client-entity';
 
 import { CreateAppointmentServiceDto } from './dto/create-appointment-service.dto';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -26,8 +28,14 @@ export class AppointmentService {
         @InjectRepository(AppointmentServicesViewEntity)
         private readonly appointmentServicesViewRepository: Repository<AppointmentServicesViewEntity>,
 
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+        /*@InjectRepository(User)
+        private readonly userRepository: Repository<User>,*/
+        @InjectRepository(ClientEntity)
+        private readonly clientRepository: Repository<ClientEntity>,
+
+
+        @InjectRepository(AuthorizedPersonnelEntity)
+        private readonly employRepository: Repository<AuthorizedPersonnelEntity>,
 
         @InjectRepository(UserVehicleViewEntity)
         private readonly userVehicleRepository: Repository<UserVehicleViewEntity>,
@@ -82,29 +90,29 @@ export class AppointmentService {
     }
 
     async getAppointmentsWithServices(idData: number): Promise<any> {
-        // Obtener el nombre del empleado por su ID
-        const employ = await this.userRepository.findOne({
-            where: { id: idData, rol: 'empleado' }, // Asegúrate de que el rol sea 'empleado'
-            select: ['nombre']
+        // Buscar el empleado por ID y asegurarse de que tiene el rol 'empleado'
+        const employ = await this.employRepository.findOne({
+            where: { id: idData}
         });
 
-        // Si no encontramos el empleado, devolver un error o mensaje
+        // Si no encontramos el empleado, lanzar un error
         if (!employ) {
-            throw new Error("Empleado no encontrado xd");
+            throw new Error("Empleado no encontrado");
         }
 
-        // Obtener las citas filtradas por el nombre del empleado
+        // Obtener las citas filtradas por el ID del empleado
         const appointments = await this.appointmentServicesViewRepository.find({
-            where: { nombreEmpleado: employ.nombre }  // Filtramos por el nombre del empleado
+            where: { empleado_id: employ.id } // Filtramos por el ID en vez del nombre completo
         });
 
         // Agrupar las citas por appointment_id
         const groupedAppointments = appointments.reduce((acc, curr) => {
-            // Si la cita ya existe en el acumulador, agregamos el servicio
             if (!acc[curr.appointment_id]) {
                 acc[curr.appointment_id] = {
                     appointment_id: curr.appointment_id,
+                    cliente_id: curr.cliente_id, // Agregamos el ID del cliente
                     nombreCliente: curr.nombreCliente,
+                    empleado_id: curr.empleado_id, // ID del empleado
                     nombreEmpleado: curr.nombreEmpleado,
                     fecha: curr.fecha,
                     hora: curr.hora,
@@ -117,7 +125,7 @@ export class AppointmentService {
                 };
             }
 
-            // Añadimos el servicio a la cita
+            // Añadir el servicio a la lista dentro de la cita
             acc[curr.appointment_id].services.push({
                 servicio: curr.servicio,
                 costo: curr.costo,
@@ -129,6 +137,7 @@ export class AppointmentService {
         // Convertir el objeto a un array de citas y devolverlo
         return Object.values(groupedAppointments);
     }
+
 
 
     //Método para obtener los usuarios con el rol 'client'
@@ -148,15 +157,14 @@ export class AppointmentService {
         }[]
     > {
         // Obtener todos los usuarios con rol 'client'
-        const users = await this.userRepository.find({
-            where: { rol: 'cliente' },
+        const users = await this.clientRepository.find({
             select: ['id', 'nombre']
         });
 
         // Obtener todos los vehículos de esos usuarios
         const usersWithVehicles = await Promise.all(users.map(async (user) => {
             const vehicles = await this.userVehicleRepository.find({
-                where: { user_id: user.id }
+                where: { idCliente: user.id }
             });
 
             // Agrupar vehículos por marca
@@ -171,17 +179,17 @@ export class AppointmentService {
             }> = {};
 
             vehicles.forEach(vehicle => {
-                if (!vehiclesGroupedByMarca[vehicle.vehicle_marca]) {
-                    vehiclesGroupedByMarca[vehicle.vehicle_marca] = {
-                        vehicle_marca: vehicle.vehicle_marca,
+                if (!vehiclesGroupedByMarca[vehicle.marca]) {
+                    vehiclesGroupedByMarca[vehicle.marca] = {
+                        vehicle_marca: vehicle.marca,
                         modelos: []
                     };
                 }
-                vehiclesGroupedByMarca[vehicle.vehicle_marca].modelos.push({
-                    vehicle_id: vehicle.vehicle_id,
-                    vehicle_modelo: vehicle.vehicle_modelo,
-                    vehicle_año: vehicle.vehicle_año,
-                    vehicle_placa: vehicle.vehicle_placa
+                vehiclesGroupedByMarca[vehicle.marca].modelos.push({
+                    vehicle_id: vehicle.idVehiculo,
+                    vehicle_modelo: vehicle.modelo,
+                    vehicle_año: vehicle.año,
+                    vehicle_placa: vehicle.placa
                 });
             });
 
@@ -198,7 +206,7 @@ export class AppointmentService {
     //Método para obtener usuarios con el rol 'employ'
     async getAllEmployees() {
         // Obtener todos los usuarios con rol 'employ'
-        const employees = await this.userRepository.find({
+        const employees = await this.employRepository.find({
             where: { rol: 'empleado' },
             select: ['id', 'nombre']
         });
@@ -216,11 +224,11 @@ export class AppointmentService {
         // Realizar la consulta para obtener el vehículo basado en el ID del usuario, marca y modelo
         const vehicle = await this.userVehicleRepository.findOne({
             where: {
-                user_id: userId,  // Filtrar por ID de usuario
-                vehicle_marca: selectedMarca,  // Filtrar por la marca del vehículo
-                vehicle_modelo: selectedModelo,  // Filtrar por el modelo del vehículo
+                idCliente: userId,  // Filtrar por ID de usuario
+                marca: selectedMarca,  // Filtrar por la marca del vehículo
+                modelo: selectedModelo,  // Filtrar por el modelo del vehículo
             },
-            select: ['vehicle_id', 'vehicle_marca', 'vehicle_modelo', 'vehicle_año', 'vehicle_placa'], // Seleccionar los campos que necesitas
+            select: ['idVehiculo', 'marca', 'modelo', 'año', 'placa'], // Seleccionar los campos que necesitas
         });
 
         // Verificar si no se encontró el vehículo

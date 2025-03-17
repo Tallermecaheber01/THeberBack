@@ -1,29 +1,38 @@
 import { Entity, ViewEntity, PrimaryColumn, Column } from 'typeorm';
 
 // Usamos ViewEntity para representar una vista en lugar de @Entity
-@ViewEntity('user_vehicle_view')
+@ViewEntity('vw_client_vehicles')
 export class UserVehicleViewEntity {
-  @PrimaryColumn()
-  user_id: number;
-
   @Column()
-  user_nombre: string;
+    idCliente: number;
 
-  @PrimaryColumn()
-  vehicle_id: number;
+    @Column()
+    nombreCompletoCliente: string;
 
-  @Column()
-  vehicle_numeroSerie: string;
+    @Column()
+    correoCliente: string;
 
-  @Column()
-  vehicle_marca: string;
+    @Column()
+    telefonoCliente: string;
 
-  @Column()
-  vehicle_modelo: string;
+    @Column()
+    rolCliente: string;
 
-  @Column()
-  vehicle_año: number;
+    @Column()
+    idVehiculo: number;
 
-  @Column()
-  vehicle_placa: string;
+    @Column()
+    numeroSerie: string;
+
+    @Column()
+    marca: string;
+
+    @Column()
+    modelo: string;
+
+    @Column()
+    año: number;
+
+    @Column()
+    placa: string;
 }

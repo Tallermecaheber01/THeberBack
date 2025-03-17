@@ -16,11 +16,13 @@ import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { RepairEntity } from './repair/entities/repair.entity';
 import { AppointmentCancellationEntity } from './appointment/entities/appointment-cancellation-entity';
 import { CancelledAppointmentsViewEntity } from './entities-view/appointments_cancelled_view';
+import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';
+import { ClientEntity } from 'src/public/register/entity/client-entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([AppointmentEntity,User,UserVehicleViewEntity,ServiceEntity,
     AppointmentServiceEntity,AppointmentServicesViewEntity,RepairEntity, AppointmentCancellationEntity,
-    CancelledAppointmentsViewEntity
+    CancelledAppointmentsViewEntity,AuthorizedPersonnelEntity,ClientEntity
   ])],
   controllers: [EmployController],
   providers: [AppointmentService, RepairService],
