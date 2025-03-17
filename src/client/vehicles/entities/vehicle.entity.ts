@@ -22,6 +22,5 @@ export class VehicleEntity {
     placa: string;
 
     @ManyToOne(() => User, user => user.vehiculos, {onDelete:'CASCADE'})
-    
     idPropietario:User;
 }

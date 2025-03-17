@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
+import { QuestionSecretEntity } from './questions-secret-entity';
 
 @Entity('users')  // Esto indica que esta entidad corresponde a la tabla 'users'
 export class User {
@@ -38,4 +39,10 @@ export class User {
 
   @OneToMany(() => VehicleEntity, (vehicle) => vehicle.idPropietario)
   vehiculos: VehicleEntity[];
+
+  @Column({ type: 'int', nullable: true }) 
+  idPreguntaSecreta: number;  
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  respuestaSecreta: string;  
 }
