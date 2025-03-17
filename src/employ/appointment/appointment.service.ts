@@ -255,7 +255,9 @@ export class AppointmentService {
         // Agrupar los servicios asociados a esa cita
         const groupedAppointment = {
             appointment_id: appointment.appointment_id,
+            clienteId: appointment.cliente_id,
             nombreCliente: appointment.nombreCliente,
+            empladoId:appointment.empleado_id,
             nombreEmpleado: appointment.nombreEmpleado,
             fecha: appointment.fecha,
             hora: appointment.hora,
