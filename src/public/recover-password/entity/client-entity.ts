@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { AppointmentEntity } from "src/employ/appointment/entities/appointment.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('clients')
 export class ClientEntity {
@@ -26,6 +27,6 @@ export class ClientEntity {
     @Column({ type: 'varchar', length: 20, default: 'client' })
     rol: string;
 
-    @Column({ nullable: true })
-    codigo_verificacion: string;
+    @OneToMany(() => AppointmentEntity, (appointment) => appointment.cliente)
+    appointments: AppointmentEntity[]
 }

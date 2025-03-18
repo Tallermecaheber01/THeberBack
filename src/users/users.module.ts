@@ -10,12 +10,11 @@ import { FeedbackService } from './feedback/feedback.service';
 import { Feedback } from './entity/feedback.entity';
 import { LogEntity } from 'src/log/entity/log.entity';
 import { ConfigModule } from '@nestjs/config';
-import { QuestionSecretEntity } from './entity/questions-secret-entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal:true}),
-    TypeOrmModule.forFeature([User,Feedback,LogEntity, QuestionSecretEntity]),  // Para usar TypeORM
+    TypeOrmModule.forFeature([User,Feedback,LogEntity]),  // Para usar TypeORM
     JwtModule.register({
       secret: process.env.JWT_SECRET,  // Cambia esta clave secreta por una más segura
       signOptions: { expiresIn: '1h' },  // Tiempo de expiración del token

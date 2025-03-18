@@ -1,17 +1,19 @@
 import { IsDateString, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
-import { AppointmentStatus } from "../entities/appointment.entity"; // Asegúrate de importar el enum de estados si lo necesitas
+import { AppointmentStatus } from "../entities/appointment.entity"; // Importamos el enum de estados
 
 export class UpdateAppointmentDto {
     @IsOptional()
-    @IsString()
-    nombreCliente?: string;
+    @IsNumber()
+    @IsPositive()
+    IdCliente?: number; // Cambiado de nombreCliente a IdCliente
 
     @IsOptional()
-    @IsString()
-    nombreEmpleado?: string;
+    @IsNumber()
+    @IsPositive()
+    IdPersonal?: number; // Cambiado de nombreEmpleado a IdPersonal
 
     @IsOptional()
-    @IsDateString()  // Cambié IsDate() a IsDateString() para validar que sea un string de fecha en formato ISO
+    @IsDateString()  
     fecha?: string;
 
     @IsOptional()
@@ -36,7 +38,7 @@ export class UpdateAppointmentDto {
     @IsPositive()
     total?: number;
 
-    @IsOptional()  // Asegúrate de marcar estos campos como opcionales si quieres permitir que no se actualicen
+    @IsOptional()
     @IsString()
     marca?: string;
 
@@ -45,6 +47,6 @@ export class UpdateAppointmentDto {
     modelo?: string;
 
     @IsOptional()
-    @IsEnum(AppointmentStatus)  // Si el estado se puede actualizar también, asegúrate de que sea un enum válido
+    @IsEnum(AppointmentStatus)  
     estado?: AppointmentStatus; 
 }

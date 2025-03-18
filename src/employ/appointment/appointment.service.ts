@@ -5,16 +5,20 @@ import { Repository } from 'typeorm';
 import { AppointmentEntity } from './entities/appointment.entity';
 import { AppointmentServiceEntity } from './entities/appointment-services';
 import { AppointmentServicesViewEntity } from '../entities-view/appointment_services_view';
+import { AppointmentRejectionEntity } from './entities/appointment-rejection-entity';
 import { CancelledAppointmentsViewEntity } from '../entities-view/appointments_cancelled_view';
 import { UserVehicleViewEntity } from '../entities-view/user-vehicle.view.entity';
 import { User } from 'src/users/entity/user.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
+
 import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';
-import { ClientEntity } from 'src/public/register/entity/client-entity';
+import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
 
 import { CreateAppointmentServiceDto } from './dto/create-appointment-service.dto';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { CreateAppointmentRejectionDto } from './dto/create-appointment-rejection.dto';
+import { AppointmentWaitingViewEntity } from './../entities-view/appointment_waiting_view';
 
 @Injectable()
 export class AppointmentService {
@@ -28,6 +32,11 @@ export class AppointmentService {
         @InjectRepository(AppointmentServicesViewEntity)
         private readonly appointmentServicesViewRepository: Repository<AppointmentServicesViewEntity>,
 
+        @InjectRepository(AppointmentWaitingViewEntity)
+        private readonly appointmentWaitingRepository: Repository<AppointmentWaitingViewEntity>,
+
+        @InjectRepository(AppointmentRejectionEntity)
+        private readonly appointmentRejectionRepository: Repository<AppointmentRejectionEntity>,
         /*@InjectRepository(User)
         private readonly userRepository: Repository<User>,*/
         @InjectRepository(ClientEntity)
@@ -47,20 +56,35 @@ export class AppointmentService {
         private readonly cancelledAppointmentsRepository: Repository<CancelledAppointmentsViewEntity>
     ) { }
 
-    //Metodo para asignar una nueva cita
-    async createNewAppointmentWithServices(appointmentData: CreateAppointmentDto, servicesData: CreateAppointmentServiceDto[]): Promise<any> {
+    // Método para asignar una nueva cita con servicios
+    async createNewAppointmentWithServices(
+        appointmentData: CreateAppointmentDto,
+        servicesData: CreateAppointmentServiceDto[]
+    ): Promise<any> {
         console.log('📩 Datos recibidos para la cita:', appointmentData);
-        // Definir explícitamente las columnas en una constante
+
+        // Buscar el cliente y el empleado en la base de datos
+        const cliente = await this.clientRepository.findOne({ where: { id: appointmentData.IdCliente } });
+        if (!cliente) {
+            throw new Error(`❌ No se encontró el cliente con ID ${appointmentData.IdCliente}`);
+        }
+
+        const empleado = await this.employRepository.findOne({ where: { id: appointmentData.IdPersonal } });
+        if (!empleado) {
+            throw new Error(`❌ No se encontró el empleado con ID ${appointmentData.IdPersonal}`);
+        }
+
+        // Definir explícitamente los valores de la cita
         const appointmentValues = {
-            nombreCliente: appointmentData.nombreCliente,
-            nombreEmpleado: appointmentData.nombreEmpleado,
+            cliente,  // Relación con el cliente
+            empleado, // Relación con el empleado
             fecha: appointmentData.fecha,
             hora: appointmentData.hora,
             costoExtra: appointmentData.costoExtra ?? null,  // Si no viene, asigna null
             total: appointmentData.total,
             marca: appointmentData.marca,
             modelo: appointmentData.modelo,
-            estado: 'Asignada'  // Estado inicial cuando el negocio asigna una cita
+            estado: appointmentData.estado ?? 'Asignada'  // Estado inicial cuando el negocio asigna una cita
         };
 
         const newAppointment = this.appointmentRepository.create(appointmentValues);
@@ -72,27 +96,28 @@ export class AppointmentService {
         if (!savedAppointment.id) {
             throw new Error("❌ No se pudo guardar la cita correctamente");
         }
+
         // Crear los servicios y asociarlos a la cita
         const servicesToCreate = (servicesData || []).map((service) => ({
             ...service,
             idCita: savedAppointment,  // Aquí asignamos la entidad completa de la cita, no solo el ID
         }));
 
-
         // Guardar los servicios asociados
         const savedServices = await this.appointmentServiceReporitory.save(servicesToCreate);
         console.log(savedAppointment);
-        return {
 
+        return {
             appointment: savedAppointment,
             services: savedServices
         };
     }
 
+
     async getAppointmentsWithServices(idData: number): Promise<any> {
         // Buscar el empleado por ID y asegurarse de que tiene el rol 'empleado'
         const employ = await this.employRepository.findOne({
-            where: { id: idData}
+            where: { id: idData }
         });
 
         // Si no encontramos el empleado, lanzar un error
@@ -257,7 +282,7 @@ export class AppointmentService {
             appointment_id: appointment.appointment_id,
             clienteId: appointment.cliente_id,
             nombreCliente: appointment.nombreCliente,
-            empladoId:appointment.empleado_id,
+            empladoId: appointment.empleado_id,
             nombreEmpleado: appointment.nombreEmpleado,
             fecha: appointment.fecha,
             hora: appointment.hora,
@@ -287,81 +312,93 @@ export class AppointmentService {
     }
 
     async getAppointmentsInWaiting(): Promise<any[]> {
-        // Buscar todas las citas con el estado "en espera"
-        const appointments = await this.appointmentServicesViewRepository.find({
-            where: { estado: 'en espera' } // Filtrar solo las citas en espera
-        });
+        // Buscar todas las citas en espera desde la vista
+        const appointments = await this.appointmentWaitingRepository.find();
 
-        // Si no se encuentran citas, lanzamos un error
+        // Si no hay citas, devolver un array vacío en lugar de lanzar un error
         if (!appointments || appointments.length === 0) {
-            throw new Error('❌ No se encontraron citas con estado "en espera".');
+            console.warn('⚠️ No se encontraron citas con estado "en espera".');
+            return [];
         }
 
-        // Agrupar las citas por appointment_id
-        const groupedAppointments = appointments.reduce((acc, curr) => {
-            // Si la cita aún no existe en el acumulador, la inicializamos
-            if (!acc[curr.appointment_id]) {
-                acc[curr.appointment_id] = {
-                    appointment_id: curr.appointment_id,
-                    nombreCliente: curr.nombreCliente,
-                    nombreEmpleado: curr.nombreEmpleado,
-                    fecha: curr.fecha,
-                    hora: curr.hora,
-                    total: curr.total,
-                    costoExtra: curr.costoExtra,
-                    marca: curr.marca,
-                    modelo: curr.modelo,
-                    estado: curr.estado,
+        // Mapa para agrupar citas por appointment_id
+        const groupedAppointments = new Map<number, any>();
+
+        for (const appointment of appointments) {
+            if (!groupedAppointments.has(appointment.appointment_id)) {
+                groupedAppointments.set(appointment.appointment_id, {
+                    appointment_id: appointment.appointment_id,
+                    nombreCliente: appointment.nombreCliente,
+                    fecha: appointment.fecha,
+                    hora: appointment.hora,
+                    total: appointment.total,
+                    costoExtra: appointment.costoExtra,
+                    marca: appointment.marca,
+                    modelo: appointment.modelo,
+                    estado: appointment.estado,
                     services: [],
-                };
+                });
             }
 
-            // Agregar los servicios asociados a la cita
-            acc[curr.appointment_id].services.push({
-                servicio: curr.servicio,
-                costo: curr.costo,
+            // Agregar los servicios a la cita correspondiente
+            groupedAppointments.get(appointment.appointment_id).services.push({
+                servicio: appointment.servicio,
+                costo: appointment.costo,
             });
+        }
 
-            return acc;
-        }, {});
-
-        // Convertir el objeto acumulado en un arreglo de citas y devolverlo
-        return Object.values(groupedAppointments);
+        // Convertir el mapa en un array y devolverlo
+        return Array.from(groupedAppointments.values());
     }
+
 
     async updateAppointmentStatusAndDetails(
         appointmentId: number,
         updateData: UpdateAppointmentDto
     ): Promise<AppointmentEntity> {
-        // Buscar la cita con el estado "en espera" usando el ID
+        console.log('📩 Datos recibidos para actualizar:', updateData);
+
+        // Buscar la cita con estado "en espera"
         const appointment = await this.appointmentRepository.findOne({
             where: { id: appointmentId, estado: 'en espera' },
+            relations: ['empleado'] // Asegura que la relación con el empleado se cargue
         });
 
-        // Si no se encuentra la cita con el estado "en espera", lanzamos un error
         if (!appointment) {
-            throw new Error('❌ No se encontró la cita con estado "en espera".');
+            throw new Error(`❌ No se encontró la cita con estado "en espera" y ID ${appointmentId}.`);
         }
 
-        // Actualizamos solo los campos que vienen en el DTO (total, nombreEmpleado, estado)
-        if (updateData.total !== undefined) {
-            appointment.total = updateData.total;
+        console.log('🔍 Cita encontrada:', appointment);
+
+        // Si se proporciona un nuevo IdPersonal, buscar el empleado en la BD
+        if (updateData.IdPersonal !== undefined) {
+            const empleado = await this.employRepository.findOne({
+                where: { id: updateData.IdPersonal },
+            });
+
+            if (!empleado) {
+                throw new Error(`❌ No se encontró el empleado con ID ${updateData.IdPersonal}.`);
+            }
+
+            console.log('👨‍🔧 Empleado encontrado:', empleado);
+            appointment.empleado = empleado;  // Asignar la relación con el empleado
         }
 
-        if (updateData.nombreEmpleado !== undefined) {
-            appointment.nombreEmpleado = updateData.nombreEmpleado;
-        }
+        // Actualizar otros valores
+        appointment.total = updateData.total ?? appointment.total;
+        appointment.estado = updateData.estado ?? appointment.estado;
 
-        if (updateData.estado) {
-            appointment.estado = updateData.estado; // Asegúrate de validar que el estado sea "Aceptada" o "Rechazada"
-        }
+        console.log('📌 Entidad antes de guardar:', appointment);
 
-        // Guardar los cambios en la base de datos
-        await this.appointmentRepository.save(appointment);
+        // Guardar cambios en la BD
+        const savedAppointment = await this.appointmentRepository.save(appointment);
 
-        // Devolver la cita actualizada
-        return appointment;
+        console.log('✅ Cita actualizada y guardada:', savedAppointment);
+
+        return savedAppointment;
     }
+
+
 
     async getCancelledAppointments(): Promise<any[]> {
         // Obtener todas las citas canceladas sin filtrar por estado
@@ -419,4 +456,28 @@ export class AppointmentService {
         return Object.values(groupedAppointments);
     }
 
+    //Servicio para rechazar una cita
+    async rejectAppointment(data: CreateAppointmentRejectionDto): Promise<AppointmentRejectionEntity> {
+        const appointment = await this.appointmentRepository.findOne({ where: { id: data.idCita } });
+        if (!appointment) {
+            throw new Error(`❌ No se encontró la cita con ID ${data.idCita}`);
+        }
+
+        const empleado = await this.employRepository.findOne({ where: { id: data.idPersonal } });
+        if (!empleado) {
+            throw new Error(`❌ No se encontró el empleado con ID ${data.idPersonal}`);
+        }
+
+        // Cambiar el estado de la cita a "Rechazada"
+        appointment.estado = 'Rechazada';
+        await this.appointmentRepository.save(appointment);
+
+        const rejection = this.appointmentRejectionRepository.create({
+            appointment,
+            motivo: data.motivo,
+            empleado
+        });
+
+        return await this.appointmentRejectionRepository.save(rejection);
+    }
 }

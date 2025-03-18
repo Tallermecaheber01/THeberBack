@@ -17,7 +17,7 @@ import { InformationService } from './information/information.service';
     TypeOrmModule.forFeature([ClientEntity,UserViewEntity,LogEntity,AuthorizedPersonnelEntity]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions:{expiresIn:'1h'},
+      signOptions: { expiresIn: '1h' }, // Token expira en 1 minuto
     })
   ],
   controllers: [PublicController],

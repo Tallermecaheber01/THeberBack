@@ -26,10 +26,11 @@ import { VehicleEntity } from './client/vehicles/entities/vehicle.entity';
 import { RepairEntity } from './employ/repair/entities/repair.entity';
 import { AppointmentCancellationEntity } from './employ/appointment/entities/appointment-cancellation-entity';
 import { CancelledAppointmentsViewEntity } from './employ/entities-view/appointments_cancelled_view';
-import { QuestionSecretEntity } from './users/entity/questions-secret-entity';
-import { ClientEntity } from './public/register/entity/client-entity';
+import { ClientEntity } from './public/recover-password/entity/client-entity';
 import { UserViewEntity } from './public/register/view/vw-users-entity';
 import { AuthorizedPersonnelEntity } from './public/recover-password/entity/authorized-personnel-entity';
+import { AppointmentWaitingViewEntity } from './employ/entities-view/appointment_waiting_view';
+import { AppointmentRejectionEntity } from './employ/appointment/entities/appointment-rejection-entity';
 
 @Module({
   imports: [
@@ -50,8 +51,8 @@ import { AuthorizedPersonnelEntity } from './public/recover-password/entity/auth
           User, Feedback, ServiceEntity, BrandEntity, VehicleTypeEntity,
           AppointmentEntity, UserVehicleViewEntity, VehicleEntity, AppointmentServiceEntity,
           AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
-          CancelledAppointmentsViewEntity,LogEntity,QuestionSecretEntity,ClientEntity,UserViewEntity,
-          AuthorizedPersonnelEntity
+          CancelledAppointmentsViewEntity,LogEntity,ClientEntity,UserViewEntity,
+          AuthorizedPersonnelEntity,AppointmentWaitingViewEntity,AppointmentRejectionEntity
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),

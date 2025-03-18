@@ -2,13 +2,15 @@ import { IsDateString, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from
 import { AppointmentStatus } from "../entities/appointment.entity";  // Importar el enum de estados
 
 export class CreateAppointmentDto {
-    @IsString()
-    nombreCliente: string;
+    @IsNumber()
+    @IsPositive()
+    IdCliente: number;  // Ahora se usa el ID del cliente en lugar del nombre
 
-    @IsString()
-    nombreEmpleado: string;
+    @IsNumber()
+    @IsPositive()
+    IdPersonal: number;  // Ahora se usa el ID del empleado en lugar del nombre
 
-    @IsDateString()  // Validación para fechas en formato string
+    @IsDateString()  // Validación para fechas en formato string ISO
     fecha: string;
 
     @IsString()

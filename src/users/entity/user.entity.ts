@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
-import { QuestionSecretEntity } from './questions-secret-entity';
 
 @Entity('users')  // Esto indica que esta entidad corresponde a la tabla 'users'
 export class User {

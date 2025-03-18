@@ -9,6 +9,7 @@ import { CreateAppointmentServiceDto } from './appointment/dto/create-appointmen
 import { CreateRepairDto } from './repair/dto/create-repair.dto'; //Al igual que se vuelve a importar el dto
 import { RepairEntity } from './repair/entities/repair.entity';
 import { AppointmentEntity } from './appointment/entities/appointment.entity';
+import { CreateAppointmentRejectionDto } from './appointment/dto/create-appointment-rejection.dto';
 
 @Controller('employ')
 export class EmployController {
@@ -104,6 +105,20 @@ export class EmployController {
         // Llamada al servicio para obtener citas canceladas
         return this.appointmentService.getCancelledAppointments();
     }
+
+    @Post('appointment/reject')
+    async rejectAppointment(
+        @Body() rejectionData: CreateAppointmentRejectionDto
+    ) {
+        // Llamamos al servicio para procesar el rechazo
+        const result = await this.appointmentService.rejectAppointment(rejectionData);
+
+        return {
+            message: '✅ Cita rechazada con éxito',
+            rejection: result
+        };
+    }
+
 
 
 

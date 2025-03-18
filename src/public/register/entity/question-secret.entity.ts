@@ -1,10 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('questionsecret')
-export class QuestionSecretEntity {
+export class QuestionSecretEntity{
     @PrimaryGeneratedColumn()
-    id: number;
+    id:number;
 
-    @Column()
+    @Column({type:'text', nullable:false})
     pregunta: string;
 }

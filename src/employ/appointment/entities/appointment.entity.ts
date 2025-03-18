@@ -1,7 +1,10 @@
 import { IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { AppointmentRejectionEntity } from "./appointment-rejection-entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { AppointmentServiceEntity } from "./appointment-services";
 import { AppointmentCancellationEntity } from "./appointment-cancellation-entity";
+import { ClientEntity } from "src/public/recover-password/entity/client-entity";
+import { AuthorizedPersonnelEntity } from "src/public/recover-password/entity/authorized-personnel-entity";
 
 // Definir los posibles estados de la cita
 export enum AppointmentStatus {
@@ -20,48 +23,41 @@ export class AppointmentEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 255 })
-    @IsString()
-    nombreCliente: string;
+    @ManyToOne(() => ClientEntity, (cliente) => cliente.appointments, { eager: true })
+    @JoinColumn({ name: "IdCliente" })
+    cliente: ClientEntity;
 
-    @Column({ type: 'varchar', length: 255 })
-    @IsString()
-    nombreEmpleado: string;
+    @ManyToOne(() => AuthorizedPersonnelEntity, (empleado) => empleado.appointments, { eager: true })
+    @JoinColumn({ name: "IdPersonal" }) // Esta relación manejará automáticamente el ID
+    empleado: AuthorizedPersonnelEntity;
 
     @Column({ type: 'date' })
-    @IsDate()
     fecha: string;
 
     @Column({ type: 'time' })
-    @IsString()
     hora: string;
 
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-    @IsOptional()
-    @IsNumber()
     costoExtra: number;
 
     @Column({ type: 'decimal', precision: 10, scale: 2 })
-    @IsNumber()
-    @IsPositive()
     total: number;
 
     @Column({ type: 'varchar', length: 100 })
-    @IsString()
     marca: string;
 
     @Column({ type: 'varchar', length: 100 })
-    @IsString()
     modelo: string;
 
     @Column({ type: 'varchar', length: 50 })
-    @IsString()
     estado: string;
-
 
     @OneToMany(() => AppointmentServiceEntity, (service) => service.idCita, { cascade: true })
     services: AppointmentServiceEntity[];
 
     @OneToMany(() => AppointmentCancellationEntity, (cancellation) => cancellation.idCita)
     cancellations: AppointmentCancellationEntity[];
+
+    @OneToMany(() => AppointmentRejectionEntity, (rejection) => rejection.appointment, { cascade: true })
+    rejections: AppointmentRejectionEntity[];
 }
