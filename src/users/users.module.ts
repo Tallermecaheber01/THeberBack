@@ -17,7 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     TypeOrmModule.forFeature([User,Feedback,LogEntity]),  // Para usar TypeORM
     JwtModule.register({
       secret: process.env.JWT_SECRET,  // Cambia esta clave secreta por una más segura
-      signOptions: { expiresIn: '1h' },  // Tiempo de expiración del token
+      signOptions: { expiresIn: '1m' },  // Tiempo de expiración del token
     }),
   ],
   controllers: [UsersController],

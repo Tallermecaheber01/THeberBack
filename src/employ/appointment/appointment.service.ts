@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 
 import { AppointmentEntity } from './entities/appointment.entity';
 import { AppointmentServiceEntity } from './entities/appointment-services';
@@ -238,6 +238,16 @@ export class AppointmentService {
         return employees;
     }
 
+    async getClientById(id: number) {
+        const client = await this.clientRepository.findOne({
+          where: { id },
+          select: ['id', 'nombre', 'apellido_materno', 'apellido_paterno']
+        });
+        return client;
+      }
+      
+  
+
     async getAllServices() {
         const services = await this.serviceRepository.find({
             select: ['id', 'nombre']
@@ -398,7 +408,52 @@ export class AppointmentService {
         return savedAppointment;
     }
 
-
+    async updateAppointmentIfConfirmed(
+        appointmentId: number,
+        updateData: UpdateAppointmentDto
+    ): Promise<AppointmentEntity> {
+        console.log('📩 Datos recibidos para actualizar:', updateData);
+    
+        // Buscar la cita con estado "confirmada"
+        const appointment = await this.appointmentRepository.findOne({
+            where: { id: appointmentId, estado: 'confirmada' },
+            relations: ['empleado']
+        });
+    
+        if (!appointment) {
+            throw new Error(`❌ No se encontró la cita con estado "confirmada" y ID ${appointmentId}.`);
+        }
+    
+        console.log('🔍 Cita encontrada:', appointment);
+    
+        // Si se proporciona un nuevo IdPersonal, buscar el empleado en la BD
+        if (updateData.IdPersonal !== undefined) {
+            const empleado = await this.employRepository.findOne({
+                where: { id: updateData.IdPersonal },
+            });
+    
+            if (!empleado) {
+                throw new Error(`❌ No se encontró el empleado con ID ${updateData.IdPersonal}.`);
+            }
+    
+            console.log('👨‍🔧 Empleado encontrado:', empleado);
+            appointment.empleado = empleado;  // Asignar la relación con el empleado
+        }
+    
+        // Actualizar otros valores
+        appointment.total = updateData.total ?? appointment.total;
+        appointment.estado = updateData.estado ?? appointment.estado;
+    
+        console.log('📌 Entidad antes de guardar:', appointment);
+    
+        // Guardar cambios en la BD
+        const savedAppointment = await this.appointmentRepository.save(appointment);
+    
+        console.log('✅ Cita actualizada y guardada:', savedAppointment);
+    
+        return savedAppointment;
+    }
+    
 
     async getCancelledAppointments(): Promise<any[]> {
         // Obtener todas las citas canceladas sin filtrar por estado

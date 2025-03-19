@@ -1,16 +1,41 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity('repair') //Este es el nombre de la tabla de reparaciones
+@Entity('repairs') // Nombre de la tabla en la base de datos
 export class RepairEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    description: string;
+    idEmpleado: number;
 
     @Column()
-    // Aquí puedes agregar otros campos según sea necesario
-    status: string;
+    idCliente: number;
 
-    // Otros campos
+    @Column()
+    idCita: number;
+
+    @Column({ type: 'timestamp' })
+    fechaHoraAtencion: Date;
+
+    // Usamos simple-array para almacenar un arreglo de strings como una cadena separada por comas
+    @Column("json")
+    servicio: string[];
+
+    @Column({ type: 'date' })
+    fechaCita: Date;
+
+    @Column()
+    horaCita: string;
+
+    @Column("decimal")
+    costoInicial: number;
+
+    @Column({ nullable: true })
+    comentario?: string;
+
+    @Column("decimal")
+    extra: number;
+
+    @Column("decimal")
+    totalFinal: number;
 }
