@@ -152,9 +152,6 @@ export class EmployController {
     ): Promise<RepairEntity> {
       // 1. Crear la reparación
       const repair = await this.repairService.createNewRepair(repairData);
-      
-      // 2. Actualizar la cita asociada al finalizar la reparación.
-      // Se asume que repairData contiene el identificador de la cita (por ejemplo, idCita)
       const updateData: UpdateAppointmentDto = { estado: AppointmentStatus.COMPLETED };
       
       await this.appointmentService.updateAppointmentIfConfirmed(
