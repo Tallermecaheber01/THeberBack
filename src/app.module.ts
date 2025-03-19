@@ -31,6 +31,7 @@ import { UserViewEntity } from './public/register/view/vw-users-entity';
 import { AuthorizedPersonnelEntity } from './public/recover-password/entity/authorized-personnel-entity';
 import { AppointmentWaitingViewEntity } from './employ/entities-view/appointment_waiting_view';
 import { AppointmentRejectionEntity } from './employ/appointment/entities/appointment-rejection-entity';
+import { QuestionSecretEntity } from './public/register/entity/question-secret.entity';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { AppointmentRejectionEntity } from './employ/appointment/entities/appoin
           AppointmentEntity, UserVehicleViewEntity, VehicleEntity, AppointmentServiceEntity,
           AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity,LogEntity,ClientEntity,UserViewEntity,
-          AuthorizedPersonnelEntity,AppointmentWaitingViewEntity,AppointmentRejectionEntity
+          AuthorizedPersonnelEntity,AppointmentWaitingViewEntity,AppointmentRejectionEntity,QuestionSecretEntity
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),

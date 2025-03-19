@@ -1,5 +1,6 @@
 import { AppointmentEntity } from "src/employ/appointment/entities/appointment.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { QuestionSecretEntity } from "src/public/register/entity/question-secret.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('clients')
 export class ClientEntity {
@@ -29,4 +30,19 @@ export class ClientEntity {
 
     @OneToMany(() => AppointmentEntity, (appointment) => appointment.cliente)
     appointments: AppointmentEntity[]
+
+    @ManyToOne(() => QuestionSecretEntity, (preguntaSecreta) => preguntaSecreta.clientes, { eager: true })
+    @JoinColumn({ name: 'idPreguntaSecreta' })
+    preguntaSecreta: QuestionSecretEntity
+
+    @Column({ type: 'varchar', length: 255 })
+    respuestaSecreta: string;
+
+    // Nueva columna: estado (ENUM)
+    @Column({ type: 'enum', enum: ['activo', 'bloqueado'], default: 'activo' })
+    estado: 'activo' | 'bloqueado';
+
+    // Nueva columna: fechaDesbloqueo (puede ser nula si no está bloqueado)
+    @Column({ type: 'datetime', nullable: true })
+    fechaDesbloqueo: Date | null;
 }

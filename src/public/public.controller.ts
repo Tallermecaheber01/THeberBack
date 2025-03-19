@@ -24,10 +24,11 @@ export class PublicController {
 
     // Endpoint para verificar el código de verificación
     @Post('register/verify-code')
-    async verifyCode(@Body() data: { correo: string, code: string }): Promise<string> {
+    async verifyCode(@Body() data: { correo: string; code: string }) {
         const { correo, code } = data;
         return this.registerService.verifyCode(correo, code);
     }
+
 
     // Endpoint para registrar un nuevo usuario
     @Post('register')
@@ -67,5 +68,10 @@ export class PublicController {
     async resetPassword(@Body() data: { correo: string, newPassword: string }): Promise<string> {
         const { correo, newPassword } = data;
         return this.recoverPasswordService.resetPassword(correo, newPassword);
+    }
+
+    @Get('questions/secret')
+    async getAllQuestions() {
+        return this.registerService.getAllQuestions();
     }
 }

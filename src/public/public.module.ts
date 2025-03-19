@@ -5,16 +5,18 @@ import { RegisterService } from './register/register.service';
 import { LoginService } from './login/login.service';
 import { RecoverPasswordService } from './recover-password/recover-password.service';
 import { ConfigModule } from '@nestjs/config';
-import { ClientEntity } from './register/entity/client-entity';
+import { ClientEntity } from './recover-password/entity/client-entity';
 import { AuthorizedPersonnelEntity } from './recover-password/entity/authorized-personnel-entity';
 import { UserViewEntity } from './register/view/vw-users-entity';
 import { JwtModule } from '@nestjs/jwt';
 import { LogEntity } from 'src/log/entity/log.entity';
 import { InformationService } from './information/information.service';
+import { QuestionSecretEntity } from './register/entity/question-secret.entity';
+
 @Module({
   imports:[
     ConfigModule.forRoot({isGlobal:true}),
-    TypeOrmModule.forFeature([ClientEntity,UserViewEntity,LogEntity,AuthorizedPersonnelEntity]),
+    TypeOrmModule.forFeature([ClientEntity,UserViewEntity,LogEntity,AuthorizedPersonnelEntity,QuestionSecretEntity]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' }, // Token expira en 1 minuto

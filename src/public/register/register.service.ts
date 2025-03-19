@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClientEntity } from './entity/client-entity';
+import { ClientEntity } from '../recover-password/entity/client-entity';
 import { UserViewEntity } from './view/vw-users-entity';
 import { Repository } from 'typeorm';
 import * as nodemailer from 'nodemailer';
@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import { CreateClientDto } from './dto/create-client-dto';
+import { QuestionSecretEntity } from './entity/question-secret.entity';
 
 @Injectable()
 export class RegisterService {
@@ -19,7 +20,10 @@ export class RegisterService {
         private clientRepository: Repository<ClientEntity>,
 
         @InjectRepository(UserViewEntity)
-        private userViewRepository: Repository<UserViewEntity>
+        private userViewRepository: Repository<UserViewEntity>,
+
+        @InjectRepository(QuestionSecretEntity)
+        private questionsRepository: Repository<QuestionSecretEntity>,
     ) { }
 
     // Configura el transporte de nodemailer
@@ -30,6 +34,11 @@ export class RegisterService {
             pass: "l e d e q s p o b k f s w a u f", // Contraseña o token de aplicación
         },
     });
+
+    async getAllQuestions() {
+        const questions = await this.questionsRepository.find({});
+        return questions;
+    }
 
     async sendVerificationCode(correo: string): Promise<string> {
 
@@ -119,34 +128,35 @@ export class RegisterService {
         `,
             //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
         });
-
+        console.log(verificationCode);
         return 'Correo con código de verificación enviado';
     }
 
-    async verifyCode(email: string, code: string): Promise<string> {
-
-        //verificar si el codigo es correcto o ya expiro
-        const storedData = this.verificationCodes.get(email);
+    async verifyCode(correo: string, code: string): Promise<{ success: boolean; message: string }> {
+        // Verificar si el código existe para el correo
+        const storedData = this.verificationCodes.get(correo);
         if (!storedData) {
-
-            throw new Error('No se encontró un código de verificación para este correo');
+            return { success: false, message: 'No se encontró un código de verificación para este correo' };
         }
 
         const { code: storedCode, expiresAt } = storedData;
 
-        //verificar si el codigo ingresado es el mismo y si no ha expirado
+        // Verificar si el código ingresado es correcto
         if (storedCode !== code) {
-            throw new Error('Código de verificación incorrecto');
+            return { success: false, message: 'Código de verificación incorrecto' };
         }
+
+        // Verificar si el código ha expirado
         if (moment().isAfter(expiresAt)) {
-            this.verificationCodes.delete(email); // Eliminar el código expirado
-            throw new Error('El código de verificación ha expirado');
+            this.verificationCodes.delete(correo); // Eliminar el código expirado
+            return { success: false, message: 'El código de verificación ha expirado' };
         }
 
         // El código es válido, eliminamos el código de la memoria
-        this.verificationCodes.delete(email);
-        return 'Código verificado correctamente';
+        this.verificationCodes.delete(correo);
+        return { success: true, message: 'Código verificado correctamente' };
     }
+
 
     async createUser(userData: CreateClientDto): Promise<ClientEntity> {
         const { contrasena } = userData;
