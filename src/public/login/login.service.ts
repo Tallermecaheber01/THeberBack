@@ -41,7 +41,7 @@ export class LoginService {
 
         if (user.estado === "bloqueado") {
             if (new Date() > user.fechaDesbloqueo) {
-                if (user.rol === 'empleado' || user.rol === 'admin') {
+                if (user.rol === 'empleado' || user.rol === 'administrador') {
                     const authorizedPersonnel = await this.personnelRepository.findOne({ where: { correo } });
                     if (authorizedPersonnel) {
                         authorizedPersonnel.intentosFallidos = 0;
@@ -71,7 +71,7 @@ export class LoginService {
 
         if (!isPasswordValid) {
             const userRole = user.rol;
-            if (userRole === 'empleado' || userRole === 'admin') {
+            if (userRole === 'empleado' || userRole === 'administrador') {
                 const authorizedPersonnel = await this.personnelRepository.findOne({ where: { correo } });
                 if (!authorizedPersonnel) {
                     throw new Error('Empleado o administrados no encontrado');
@@ -107,7 +107,7 @@ export class LoginService {
         }
 
         // Si el login es exitoso, restablecer intentos y fecha de desbloqueo
-        if (user.rol === 'empleado' || user.rol === 'admin') {
+        if (user.rol === 'empleado' || user.rol === 'administrador') {
             const authorizedPersonnel = await this.personnelRepository.findOne({ where: { correo } });
 
             if (authorizedPersonnel) {

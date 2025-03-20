@@ -193,7 +193,7 @@ export class RecoverPasswordService {
         const hashedPassword = await bcrypt.hash(newPassword, salt);  // Encripta la nueva contraseña
 
         // Dependiendo del rol, actualizar la contraseña en la tabla correspondiente
-        if (userRole === 'empleado' || userRole === 'admin') {
+        if (userRole === 'empleado' || userRole === 'administrador') {
             const authorizedPersonnel = await this.authorizedPersonnelRepository.findOne({ where: { correo } });
             if (!authorizedPersonnel) {
                 throw new Error('Empleado o administrador no encontrado');
