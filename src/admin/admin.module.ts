@@ -8,11 +8,14 @@ import { BrandEntity } from './service/entities/brand.entity';
 import { VehicleTypeEntity } from './service/entities/vehicle.entity';
 import { ContactService } from './contact/contact.service';
 import { CorporateimageService } from './corporateimage/corporateimage.service';
+import { CorporateImage } from './corporateimage/entities/corporateimage.entity';
+import { Contact } from './contact/entities/contacts.entity';
+
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ServiceEntity, BrandEntity, VehicleTypeEntity])],
+  imports: [TypeOrmModule.forFeature([ServiceEntity, BrandEntity, VehicleTypeEntity, CorporateImage, Contact])],
   controllers: [AdminController],
-  providers: [ServiceService, ContactService, CorporateimageService,],
-  exports: [ServiceService], // Exporta si se necesita en otros módulos
+  providers: [ServiceService,  ContactService, CorporateimageService,],
+  exports: [ServiceService, CorporateimageService], // Exporta si se necesita en otros módulos
 })
 export class AdminModule { }
