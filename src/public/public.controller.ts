@@ -51,9 +51,24 @@ export class PublicController {
         return this.informationService.getUserRoleByEmail(email);
     }
 
+
+    // Buscar usuario por correo
+    @Post('recover-password/find-user')
+    async findUserByEmail(@Body('correo') correo: string): Promise<{ success: boolean }> {
+        return this.recoverPasswordService.findUserByEmail(correo);
+    }
+
     @Post('recover-password/send-verification-code')
-    async sendPasswordResetVerificationCode(@Body('correo') correo: string): Promise<string> {
-        return this.recoverPasswordService.sendPasswordResetVerificationCode(correo);
+    async sendPasswordResetVerificationCode(
+        @Body('correo') correo: string,
+        @Body('idPreguntaSecreta') idPreguntaSecreta: number,
+        @Body('respuestaSecreta') respuestaSecreta: string
+    ): Promise<string> {
+        return this.recoverPasswordService.sendPasswordResetVerificationCode(
+            correo,
+            idPreguntaSecreta,
+            respuestaSecreta
+        );
     }
 
     // Endpoint para verificar el código de verificación para restablecer la contraseña

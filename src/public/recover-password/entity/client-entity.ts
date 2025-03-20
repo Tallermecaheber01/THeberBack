@@ -45,4 +45,7 @@ export class ClientEntity {
     // Nueva columna: fechaDesbloqueo (puede ser nula si no está bloqueado)
     @Column({ type: 'datetime', nullable: true })
     fechaDesbloqueo: Date | null;
+
+    @Column({ type: "int", default: 0 })  // 🚀 Nueva columna para intentos fallidos
+    intentosFallidos: number;
 }

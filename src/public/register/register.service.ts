@@ -159,7 +159,7 @@ export class RegisterService {
 
 
     async createUser(userData: CreateClientDto): Promise<ClientEntity> {
-        const { contrasena } = userData;
+        const { contrasena, respuestaSecreta } = userData;
 
         // Verificar si la contraseña ha sido comprometida usando la API PwnedPasswords
         const isCompromised = await this.checkPasswordPwned(contrasena);
@@ -168,11 +168,11 @@ export class RegisterService {
             throw new Error('La contraseña ha sido comprometida en una brecha de seguridad. Por favor, elige otra.');
         }
 
-        // Encriptar la contraseña con MD5 si no ha sido comprometida
-        const encryptedPassword = await this.encryptPasswordWithBcrypt(contrasena);
+        //Encriptar contraseña
+        userData.contrasena = await this.encryptWithBcrypt(contrasena);
 
-        // Sustituir la contraseña en los datos del usuario con la contraseña encriptada
-        userData.contrasena = encryptedPassword;
+        //Encriptar respuesta secreta
+        userData.respuestaSecreta = await this.encryptWithBcrypt(respuestaSecreta);
 
         // Si la contraseña es segura, se crea el nuevo usuario
         const newUser = this.clientRepository.create(userData);
@@ -203,8 +203,8 @@ export class RegisterService {
         }
     }
 
-    //Metodo para encriptar la contrasela con bcrypt
-    private async encryptPasswordWithBcrypt(password: string): Promise<string> {
+    //Metodo para encriptar con bcrypt
+    private async encryptWithBcrypt(password: string): Promise<string> {
         const saltRounds = 10;  // Número de rondas de salting
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         return hashedPassword;

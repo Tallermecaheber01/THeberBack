@@ -33,91 +33,126 @@ export class RecoverPasswordService {
         },
     });
 
-    async sendPasswordResetVerificationCode(correo: string): Promise<string> {
 
-        //Buscar al usuario por su correo en la base de datos
-        const user = await this.userRepository.findOne({ where: { correo } });
+    async findUserByEmail(correo: string) {
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .select(['user.id', 'user.correo', 'user.preguntaSecreta'])
+            .where('user.correo = :correo', { correo })  // 👈 Parametrización segura
+            .getRawOne(); // 👈 Devuelve un solo resultado
+
         if (!user) {
-            throw new Error('Usuario no encontrado');
+            return { success: false };
         }
 
-        //Generar un nuevo codigo de verificacion
+        return { success: true, securityQuestion: user.preguntaSecreta };
+    }
+
+
+
+
+
+
+    async sendPasswordResetVerificationCode(
+        correo: string,
+        idPreguntaSecreta: number,
+        respuestaSecreta: string
+    ): Promise<string> {
+
+        // Buscar al usuario por correo, idPreguntaSecreta y respuestaSecreta
+        const user = await this.userRepository.findOne({
+            where: { correo, idPreguntaSecreta }
+        });
+
+        if (!user) {
+            throw new Error('Datos incorrectos. Verifica tu correo, pregunta secreta y respuesta.');
+        }
+
+        //Verificar si la respuesta secreta es correcta
+        const isMatch = await bcrypt.compare(respuestaSecreta, user.respuestaSecreta);
+        if (!isMatch) {
+            throw new Error('La respuesta secreta es incorrecta')
+        }
+
+        // Generar un nuevo código de verificación
         const verificationCode = randomInt(100000, 999999).toString();
 
-        //Establecer la expiracion del codigo(10 minutos)
+        // Establecer la expiración del código (10 minutos)
         const expiresAt = moment().add(10, 'minutes');
 
-        //Almacenar el codigo y su fecha de expiracion en memoria
+        // Almacenar el código y su fecha de expiración en memoria
         this.verificationCodes.set(correo, { code: verificationCode, expiresAt });
+
         console.log(verificationCode);
-        //Enviar el correo
+
+        // Enviar el correo
         await this.transporter.sendMail({
-            from: 'tallermecanicoheber@gmail.com', // El remitente
-            to: correo.trim(), // El correo del destinatario
+            from: 'tallermecanicoheber@gmail.com', // Remitente
+            to: correo.trim(), // Destinatario
             subject: 'Código de verificación para recuperar tu contraseña',
             html: `
-                  <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Titulo del correo</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f7f7f7;
-                margin: 0;
-                padding: 20px;
-            }
-            .container {
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 20px;
-                border: 1px solid #0056b3;
-                border-radius: 8px;
-                background-color: #ffffff;
-            }
-            h2 {
-                color: #0056b3;
-            }
-            p {
-                color: #333;
-            }
-            .code {
-                color: #e0a800; /* Color amarillo oscuro */
-                font-weight: bold;
-                font-size: 20px;
-            }
-            .image-container {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            img {
-                width: 250px;  /* Imagen más grande */
-                height: auto;
-                max-width: 100%; /* Evita desbordes en pantallas pequeñas */
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="image-container">
-                <img src="https://taller-backend-two.vercel.app/images/latest" alt="Logo" />
-            </div>
-            <h2>Titulo</h2>
-            <p>Saludo</p>
-            <p>Tu código de recuperación es: <span class="code">${verificationCode}</span>.</p>
-            <p>Este código expirará en 10 minutos.</p>
-            <p>Despedida</p>
-        </div>
-    </body>
-    </html>
-    
-              `,
-            //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
+                    <!DOCTYPE html>
+      <html lang="es">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Recuperación de contraseña</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  background-color: #f7f7f7;
+                  margin: 0;
+                  padding: 20px;
+              }
+              .container {
+                  max-width: 600px;
+                  margin: 0 auto;
+                  padding: 20px;
+                  border: 1px solid #0056b3;
+                  border-radius: 8px;
+                  background-color: #ffffff;
+              }
+              h2 {
+                  color: #0056b3;
+              }
+              p {
+                  color: #333;
+              }
+              .code {
+                  color: #e0a800;
+                  font-weight: bold;
+                  font-size: 20px;
+              }
+              .image-container {
+                  text-align: center;
+                  margin-bottom: 20px;
+              }
+              img {
+                  width: 250px;
+                  height: auto;
+                  max-width: 100%;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <div class="image-container">
+                  <img src="https://taller-backend-two.vercel.app/images/latest" alt="Logo" />
+              </div>
+              <h2>Recuperación de Contraseña</h2>
+              <p>Hola,</p>
+              <p>Tu código de recuperación es: <span class="code">${verificationCode}</span>.</p>
+              <p>Este código expirará en 10 minutos.</p>
+              <p>Si no solicitaste este código, puedes ignorar este mensaje.</p>
+          </div>
+      </body>
+      </html>
+                `,
         });
-        return 'Correo con codigo de Recuperacion enviado';
+
+        return 'Correo con código de recuperación enviado';
     }
+
 
     async verifyPasswordResetCode(email: string, code: string): Promise<string> {
         //verificar si el codigo es correcto o ya expiro

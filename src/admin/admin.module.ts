@@ -6,14 +6,13 @@ import { ServiceService } from './service/service.service';
 import { ServiceEntity } from './service/entities/service.entity';
 import { BrandEntity } from './service/entities/brand.entity';
 import { VehicleTypeEntity } from './service/entities/vehicle.entity';
-import { RegulatorydocumentsService } from './regulatorydocuments/regulatorydocuments.service';
 import { ContactService } from './contact/contact.service';
 import { CorporateimageService } from './corporateimage/corporateimage.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ServiceEntity, BrandEntity, VehicleTypeEntity])],
   controllers: [AdminController],
-  providers: [ServiceService, RegulatorydocumentsService, ContactService, CorporateimageService,],
+  providers: [ServiceService, ContactService, CorporateimageService,],
   exports: [ServiceService], // Exporta si se necesita en otros módulos
 })
 export class AdminModule { }

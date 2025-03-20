@@ -32,9 +32,17 @@ export class UserViewEntity {
     @Column({ type: 'datetime', nullable: true })
     fechaDesbloqueo: Date | null; // Nueva columna para la fecha de desbloqueo
 
-    @Column({ type: "varchar", length: 255 })
-    preguntaSecreta: string;
+    @Column({ type: "int" })  // 🛠️ Nueva columna para la ID de la pregunta secreta
+    idPreguntaSecreta: number;
 
     @Column({ type: "varchar", length: 255 })
     respuestaSecreta: string;
+
+    @Column({ type: "int", default: 0 })  // 🚀 Nueva columna para intentos fallidos
+    intentosFallidos: number;
+
+    // Aquí solo debes tener un campo de texto para la pregunta secreta
+    @Column({ type: "varchar", length: 255, nullable: true })
+    preguntaSecreta: string;
+
 }

@@ -12,9 +12,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { LogEntity } from 'src/log/entity/log.entity';
 import { InformationService } from './information/information.service';
 import { QuestionSecretEntity } from './register/entity/question-secret.entity';
+import { UnlockService } from './unlock/unlock.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports:[
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({isGlobal:true}),
     TypeOrmModule.forFeature([ClientEntity,UserViewEntity,LogEntity,AuthorizedPersonnelEntity,QuestionSecretEntity]),
     JwtModule.register({
@@ -23,6 +26,6 @@ import { QuestionSecretEntity } from './register/entity/question-secret.entity';
     })
   ],
   controllers: [PublicController],
-  providers: [RegisterService, LoginService, RecoverPasswordService, InformationService]
+  providers: [RegisterService, LoginService, RecoverPasswordService, InformationService, UnlockService]
 })
 export class PublicModule {}
