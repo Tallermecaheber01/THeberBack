@@ -5,19 +5,30 @@ import { ServiceService } from './service/service.service';
 import { CreateServiceDto } from './service/dto/create-service.dto';
 import { CreateBrandDto } from './service/dto/create-brand.dto';
 import { CreateVehicleDto } from './service/dto/create-vechicle.dto';
+import { CreateContactDto } from './contact/dto/create-contacts.dto';
 
 import { UpdateServiceDto } from './service/dto/update-service.dto';
 import { UpdateBrandDto } from './service/dto/update-brand.dto';
 import { UpdateVehicleDto } from './service/dto/update-vehicle.dto';
+import { UpdateCorporateImageDto } from './corporateimage/dto/update-corporateimage.dto';
+import { UpdateContactDto } from './contact/dto/update-contacts.dto';
 
 import { ServiceEntity } from './service/entities/service.entity';
 import { BrandEntity } from './service/entities/brand.entity';
 import { VehicleTypeEntity } from './service/entities/vehicle.entity';
+import { CorporateImage } from './corporateimage/entities/corporateimage.entity';
+import { Contact } from './contact/entities/contacts.entity';
 
+import { CorporateimageService } from './corporateimage/corporateimage.service';
+import { ContactService } from './contact/contact.service';
 
 @Controller('admin')
 export class AdminController {
-    constructor(private readonly serviceService: ServiceService) { }
+    constructor(
+        private readonly serviceService: ServiceService, 
+        private readonly corporateimageService: CorporateimageService,
+        private readonly contactService: ContactService, 
+    ) {}
 
 
     @Post('new-service')
@@ -97,5 +108,53 @@ export class AdminController {
         await this.serviceService.deleteVehicleType(id);
     }
 
+    //mision, vision
+    @Patch('updatecorporateimage/:id')
+    async updateCorporateImage(
+        @Param('id', ParseIntPipe) id: number,
+        @Body(new ValidationPipe()) updateData: UpdateCorporateImageDto
+    ): Promise<CorporateImage> {
+        return this.corporateimageService.update(id, updateData);
+    }
+
+    @Get('allcorporateimages')
+    async getAllCorporateImages(): Promise<CorporateImage[]> {
+        return this.corporateimageService.findAll();
+    }
+
+    @Get('corporateimage/:id')
+    async getCorporateImageById(@Param('id', ParseIntPipe) id: number): Promise<CorporateImage> {
+        return this.corporateimageService.findOneById(id);
+    }
+
+    @Post('newcontact')
+    async createContact(
+      @Body(new ValidationPipe()) createContactDto: CreateContactDto,
+    ): Promise<Contact> {
+      return this.contactService.create(createContactDto);
+    }
+  
+    @Patch('updatecontact/:id')
+    async updateContact(
+      @Param('id', ParseIntPipe) id: number,
+      @Body(new ValidationPipe()) updateContactDto: UpdateContactDto,
+    ): Promise<Contact> {
+      return this.contactService.update(id, updateContactDto);
+    }
+  
+    @Get('all-contacts')
+    async getAllContacts(): Promise<Contact[]> {
+      return this.contactService.findAll();
+    }
+  
+    @Get('contact/:id')
+    async getContactById(@Param('id', ParseIntPipe) id: number): Promise<Contact> {
+      return this.contactService.findOneById(id);
+    }
+  
+    @Delete('deletecontact/:id')
+    async deleteContact(@Param('id') id: number): Promise<void> {
+      await this.contactService.remove(id);
+    }
 
 }

@@ -32,6 +32,8 @@ import { AuthorizedPersonnelEntity } from './public/recover-password/entity/auth
 import { AppointmentWaitingViewEntity } from './employ/entities-view/appointment_waiting_view';
 import { AppointmentRejectionEntity } from './employ/appointment/entities/appointment-rejection-entity';
 import { QuestionSecretEntity } from './public/register/entity/question-secret.entity';
+import { CorporateImage } from './admin/corporateimage/entities/corporateimage.entity';
+import { Contact } from './admin/contact/entities/contacts.entity';
 
 @Module({
   imports: [
@@ -53,7 +55,8 @@ import { QuestionSecretEntity } from './public/register/entity/question-secret.e
           AppointmentEntity, UserVehicleViewEntity, VehicleEntity, AppointmentServiceEntity,
           AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity,LogEntity,ClientEntity,UserViewEntity,
-          AuthorizedPersonnelEntity,AppointmentWaitingViewEntity,AppointmentRejectionEntity,QuestionSecretEntity
+          AuthorizedPersonnelEntity,AppointmentWaitingViewEntity,AppointmentRejectionEntity,QuestionSecretEntity,
+          CorporateImage, Contact
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),

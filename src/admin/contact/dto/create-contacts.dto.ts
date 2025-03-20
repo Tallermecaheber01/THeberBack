@@ -11,3 +11,4 @@ export class CreateContactDto {
   @MaxLength(300)
   informacion: string;
 }
+

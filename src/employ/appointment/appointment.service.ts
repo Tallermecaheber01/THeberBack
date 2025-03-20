@@ -232,7 +232,7 @@ export class AppointmentService {
     async getAllEmployees() {
         // Obtener todos los usuarios con rol 'employ'
         const employees = await this.employRepository.find({
-            where: { rol: 'empleado' },
+            where: { rol: In(['empleado', 'administrador'])},
             select: ['id', 'nombre']
         });
         return employees;
@@ -416,7 +416,7 @@ export class AppointmentService {
     
         // Buscar la cita con estado "confirmada"
         const appointment = await this.appointmentRepository.findOne({
-            where: { id: appointmentId, estado: 'confirmada' },
+            where: { id: appointmentId, estado: In(['confirmada', 'asignada']) },
             relations: ['empleado']
         });
     
