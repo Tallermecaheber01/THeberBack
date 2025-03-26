@@ -1,6 +1,7 @@
 import { AppointmentEntity } from "src/employ/appointment/entities/appointment.entity";
 import { QuestionSecretEntity } from "src/public/register/entity/question-secret.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { VehicleEntity } from "src/client/vehicles/entities/vehicle.entity";
 
 @Entity('clients')
 export class ClientEntity {
@@ -48,4 +49,7 @@ export class ClientEntity {
 
     @Column({ type: "int", default: 0 })  // 🚀 Nueva columna para intentos fallidos
     intentosFallidos: number;
+
+    @OneToMany(()=> VehicleEntity,(vehicle) => vehicle.idPropietario)
+    vehiculos: VehicleEntity[]
 }

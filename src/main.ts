@@ -2,9 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { LoggerService } from './services/logger/logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new LoggerService()
+  });
 
   // A05 & A09: Seguridad global con Helmet (se recomienda aplicar antes de cualquier otra cosa)
   app.use(helmet());
@@ -17,29 +20,33 @@ async function bootstrap() {
 
   // A05: Configuración de Content Security Policy (CSP) reforzado
   app.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"],
-        // Nota: 'unsafe-inline' se incluye temporalmente para desarrollo.
-        // En producción se recomienda eliminarlo para mayor seguridad.
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:'],
-        connectSrc: ["'self'"],
-        // A07: Evitar que el sitio sea embebido en otros (clickjacking)
-        frameAncestors: ["'none'"],
-        formAction: ["'self'"],
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:'],
+          connectSrc: ["'self'", 'http://localhost:3000'], // Asegura que las solicitudes sean aceptadas
+          frameAncestors: ["'none'"],
+          formAction: ["'self'"],
+        },
       },
+      frameguard: { action: 'deny' },
+      noSniff: true,
     })
   );
 
+
   // A01: Configuración restrictiva de CORS
   app.enableCors({
-    origin: ['http://localhost:3001'], // Solo se permite este origen
+    origin: ['http://localhost:3001'], // Asegura que el frontend puede hacer solicitudes
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Authorization'], // Permitir que el cliente vea Authorization en la respuesta
     credentials: true,
   });
+  
 
   // Si tienes rutas estáticas, asegúrate de que también tengan los encabezados de seguridad:
   app.use('/static', (req, res, next) => {
@@ -53,7 +60,16 @@ async function bootstrap() {
   // Middleware para cookies
   app.use(cookieParser());
 
-  await app.listen(3000);
+  const logger = app.get(LoggerService);
+
+  try {
+    await app.listen(3000);
+    //throw new Error('¡Error de prueba!');
+    logger.log('La aplicación se ha arrancado', 'Bootstrap'); // Usando log en lugar de console.log
+  } catch (error) {
+    logger.error('La aplicación no se ha arrancado debido a un error', { file: 'main.ts', line: 66 });
+  }
+
 }
 
 bootstrap();

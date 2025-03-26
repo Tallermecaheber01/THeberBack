@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
-import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
 
 @Entity('users')  // Esto indica que esta entidad corresponde a la tabla 'users'
 export class User {
@@ -36,8 +35,6 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   fechaDesbloqueo: Date | null;  // Fecha de desbloqueo, si está bloqueado
 
-  @OneToMany(() => VehicleEntity, (vehicle) => vehicle.idPropietario)
-  vehiculos: VehicleEntity[];
 
   @Column({ type: 'int', nullable: true }) 
   idPreguntaSecreta: number;  

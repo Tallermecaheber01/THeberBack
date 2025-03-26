@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "src/users/entity/user.entity";
+import { ClientEntity } from "src/public/recover-password/entity/client-entity";
 
 @Entity('vehicle')
 export class VehicleEntity {
@@ -21,6 +21,6 @@ export class VehicleEntity {
     @Column({ unique: true }) // La placa también suele ser única
     placa: string;
 
-    @ManyToOne(() => User, user => user.vehiculos, {onDelete:'CASCADE'})
-    idPropietario:User;
+    @ManyToOne(() => ClientEntity, client => client.vehiculos, {onDelete:'CASCADE'})
+    idPropietario:ClientEntity;
 }

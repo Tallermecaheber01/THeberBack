@@ -5,7 +5,7 @@ import { User } from 'src/users/entity/user.entity';
 
 @Injectable()
 export class InformationService {
-  constructor(
+  /*constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
@@ -34,7 +34,6 @@ export class InformationService {
       // Si el usuario no existe, lanzamos una excepción
       throw new Error('Usuario no encontrado');
     }
-
     return user.rol; // Retorna solo el rol
-  }
+  }*/
 }

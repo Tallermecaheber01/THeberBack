@@ -1,14 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserViewEntity } from './view/vw-users-entity';
 import { Repository } from 'typeorm';
+//import { LogEntity } from 'src/log/entity/log.entity';
+import { LoggerService } from 'src/services/logger/logger.service';
 
 @Injectable()
 export class InformationService {
     constructor(
         @InjectRepository(UserViewEntity)
         private readonly userRepository: Repository<UserViewEntity>,
+
+       /* @InjectRepository(LogEntity)
+        private readonly logRepository: Repository<LogEntity>,*/
+
+        private readonly logger: LoggerService,
     ) { }
+
+    //Funcion para registrar logs
+    /*async saveLog(level: string, message: string, user: string, extraInfo?: string) {
+        await this.logRepository.save({
+            level,
+            message,
+            user,
+            extraInfo,
+            timestamp: new Date(),
+        });
+    }*/
 
     async getUserByEmail(correo: string): Promise<UserViewEntity | null> {
         const user = await this.userRepository.findOne({
@@ -16,10 +34,11 @@ export class InformationService {
         });
 
 
-        if (!user) {
-            // Si no se encuentra el usuario, lanzamos una excepción
-            throw new Error('Usuario no encontrado');
-        }
+        /*if (!user) {
+            this.logger.error('Consulta de usuario inexistente', { userId: correo, file: 'information.service.ts',line:38 });
+            throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+        }*/
+
         return user;
     }
 
@@ -30,10 +49,9 @@ export class InformationService {
         });
 
         if (!user) {
-            // Si el usuario no existe, lanzamos una excepción
-            throw new Error('Usuario no encontrado');
+            this.logger.error('Consulta de rol de usuario inexistente', { userId: email, file: 'information.service.ts', line:52 });
+            throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
         }
-
         return user;  // Es importante devolver el resultado o `null` si no se encuentra
     }
 

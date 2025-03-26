@@ -1,5 +1,5 @@
 import { LoginService } from './login/login.service';
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
 import { RegisterService } from './register/register.service';
 import { CreateClientDto } from './register/dto/create-client-dto';
 import { LoginDto } from './login/dto/login-dto';
@@ -7,6 +7,10 @@ import { Response } from 'express';
 import { UserViewEntity } from './information/view/vw-users-entity';
 import { InformationService } from './information/information.service';
 import { RecoverPasswordService } from './recover-password/recover-password.service';
+import { RoleGuard } from 'src/role/guards/role/role.guard';
+import { Roles } from 'src/role/role.decorator';
+import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
+
 @Controller('public')
 export class PublicController {
     constructor(
@@ -42,9 +46,13 @@ export class PublicController {
     }
 
     @Get(':email')
+    @Roles('administrador', 'cliente')
+    @UseGuards(AuthGuard, RoleGuard)  // Primero AuthGuard para verificar el token
     async getUserByEmail(@Param('email') email: string): Promise<UserViewEntity> {
         return this.informationService.getUserByEmail(email);
     }
+
+
 
     @Get(':email/role')
     async getUserRoleById(@Param('email') email: string): Promise<UserViewEntity> {

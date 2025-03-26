@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import { CreateClientDto } from './dto/create-client-dto';
 import { QuestionSecretEntity } from './entity/question-secret.entity';
+import { LogEntity } from 'src/log/entity/log.entity';
 
 @Injectable()
 export class RegisterService {
@@ -24,7 +25,21 @@ export class RegisterService {
 
         @InjectRepository(QuestionSecretEntity)
         private questionsRepository: Repository<QuestionSecretEntity>,
+
+        @InjectRepository(LogEntity)
+        private readonly logRepository: Repository<LogEntity>,
     ) { }
+
+        //Funcion para registrar logs
+        async saveLog(level: string, message: string, user: string, extraInfo?: string) {
+            await this.logRepository.save({
+                level,
+                message,
+                user,
+                extraInfo,
+                timestamp: new Date(),
+            });
+        }
 
     // Configura el transporte de nodemailer
     private transporter = nodemailer.createTransport({
@@ -44,12 +59,14 @@ export class RegisterService {
 
         // Verificar que el correo no esté vacío
         if (!correo || typeof correo !== 'string' || correo.trim() === '') {
+            await this.saveLog('ERROR', 'Correo inválido', correo, 'El correo proporcionado no es válido');
             throw new Error('El correo proporcionado no es valido');
         }
 
         // Verificar si el correo ya está en uso en la base de datos
         const existingUser = await this.userViewRepository.findOne({ where: { correo } });
         if (existingUser) {
+            await this.saveLog('WARNING', 'Correo ya registrado', correo, 'El correo ya está registrado en la base de datos');
             throw new Error('El correo ya está registrado en la base de datos');
         }
 
@@ -128,7 +145,7 @@ export class RegisterService {
         `,
             //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
         });
-        console.log(verificationCode);
+        await this.saveLog('INFO', 'Código de verificación enviado', correo, `Código: ${verificationCode}`);
         return 'Correo con código de verificación enviado';
     }
 
@@ -136,6 +153,7 @@ export class RegisterService {
         // Verificar si el código existe para el correo
         const storedData = this.verificationCodes.get(correo);
         if (!storedData) {
+            await this.saveLog('ERROR', 'Código no encontrado', correo, 'No se encontró un código de verificación para este correo');
             return { success: false, message: 'No se encontró un código de verificación para este correo' };
         }
 
@@ -143,17 +161,20 @@ export class RegisterService {
 
         // Verificar si el código ingresado es correcto
         if (storedCode !== code) {
+            await this.saveLog('WARNING', 'Código incorrecto', correo, `Código ingresado: ${code}`);
             return { success: false, message: 'Código de verificación incorrecto' };
         }
 
         // Verificar si el código ha expirado
         if (moment().isAfter(expiresAt)) {
             this.verificationCodes.delete(correo); // Eliminar el código expirado
+            await this.saveLog('ERROR', 'Código expirado', correo, `Código expirado: ${code}`);
             return { success: false, message: 'El código de verificación ha expirado' };
         }
 
         // El código es válido, eliminamos el código de la memoria
         this.verificationCodes.delete(correo);
+        await this.saveLog('INFO', 'Código verificado', correo, `Código: ${code}`);
         return { success: true, message: 'Código verificado correctamente' };
     }
 
@@ -161,22 +182,25 @@ export class RegisterService {
     async createUser(userData: CreateClientDto): Promise<ClientEntity> {
         const { contrasena, respuestaSecreta } = userData;
 
-        // Verificar si la contraseña ha sido comprometida usando la API PwnedPasswords
         const isCompromised = await this.checkPasswordPwned(contrasena);
-
         if (isCompromised) {
+            await this.saveLog('ERROR', 'Contraseña comprometida', '', 'La contraseña ha sido comprometida en una brecha de seguridad');
             throw new Error('La contraseña ha sido comprometida en una brecha de seguridad. Por favor, elige otra.');
         }
 
-        //Encriptar contraseña
-        userData.contrasena = await this.encryptWithBcrypt(contrasena);
+        try {
+            userData.contrasena = await this.encryptWithBcrypt(contrasena);
+            userData.respuestaSecreta = await this.encryptWithBcrypt(respuestaSecreta);
 
-        //Encriptar respuesta secreta
-        userData.respuestaSecreta = await this.encryptWithBcrypt(respuestaSecreta);
+            const newUser = this.clientRepository.create(userData);
+            const savedUser = await this.clientRepository.save(newUser);
 
-        // Si la contraseña es segura, se crea el nuevo usuario
-        const newUser = this.clientRepository.create(userData);
-        return this.clientRepository.save(newUser);
+            await this.saveLog('INFO', 'Usuario creado', '', `Usuario: ${savedUser.correo}`);
+            return savedUser;
+        } catch (error) {
+            await this.saveLog('ERROR', 'Error al crear usuario', '', error.message);
+            throw new Error('Hubo un error al crear el usuario');
+        }
     }
 
     // Método para verificar si la contraseña ha sido comprometida usando la API PwnedPasswords

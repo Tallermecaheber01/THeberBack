@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthorizedPersonnelEntity } from './entity/authorized-personnel-entity';
 import { ClientEntity } from './entity/client-entity';
@@ -8,6 +8,7 @@ import * as nodemailer from 'nodemailer';
 import { randomInt } from 'crypto';
 import * as moment from 'moment'
 import * as bcrypt from 'bcrypt'
+import { LogEntity } from 'src/log/entity/log.entity';
 
 @Injectable()
 export class RecoverPasswordService {
@@ -22,7 +23,21 @@ export class RecoverPasswordService {
 
         @InjectRepository(UserViewEntity)
         private readonly userRepository: Repository<UserViewEntity>,
+
+        @InjectRepository(LogEntity)
+        private readonly logRepository: Repository<LogEntity>,
     ) { }
+
+    //Funcion para registrar logs
+    async saveLog(level: string, message: string, user: string, extraInfo?: string) {
+        await this.logRepository.save({
+            level,
+            message,
+            user,
+            extraInfo,
+            timestamp: new Date(),
+        });
+    }
 
     // Configura el transporte de nodemailer
     private transporter = nodemailer.createTransport({
@@ -49,10 +64,6 @@ export class RecoverPasswordService {
     }
 
 
-
-
-
-
     async sendPasswordResetVerificationCode(
         correo: string,
         idPreguntaSecreta: number,
@@ -65,13 +76,15 @@ export class RecoverPasswordService {
         });
 
         if (!user) {
-            throw new Error('Datos incorrectos. Verifica tu correo, pregunta secreta y respuesta.');
+            await this.saveLog('WARNING', 'Recuperación de contraseña', correo, 'Datos incorrectos');
+            throw new HttpException('Datos incorrectos. Verifica tu correo, pregunta secreta y respuesta.', HttpStatus.BAD_REQUEST);
         }
 
         //Verificar si la respuesta secreta es correcta
         const isMatch = await bcrypt.compare(respuestaSecreta, user.respuestaSecreta);
         if (!isMatch) {
-            throw new Error('La respuesta secreta es incorrecta')
+            await this.saveLog('WARNING', 'Recuperación de contraseña', correo, 'Respuesta secreta incorrecta');
+            throw new HttpException('La respuesta secreta es incorrecta', HttpStatus.BAD_REQUEST);
         }
 
         // Generar un nuevo código de verificación
@@ -150,6 +163,7 @@ export class RecoverPasswordService {
                 `,
         });
 
+        await this.saveLog('INFO', 'Recuperación de contraseña', correo, `Código de verificación enviado: ${verificationCode}`);
         return 'Correo con código de recuperación enviado';
     }
 
@@ -158,23 +172,26 @@ export class RecoverPasswordService {
         //verificar si el codigo es correcto o ya expiro
         const storedData = this.verificationCodes.get(email);
         if (!storedData) {
-            throw new Error('No se encontró un código de verificación para este correo');
+            await this.saveLog('WARNING', 'Verificación de código', email, 'Código de verificación no encontrado');
+            throw new HttpException('No se encontró un código de verificación para este correo', HttpStatus.NOT_FOUND);
         }
 
         const { code: storedCode, expiresAt } = storedData;
 
         //verificar si el codigo ingresado es el mismo y si no ha expirado
         if (storedCode !== code) {
-            throw new Error('Código de verificación incorrecto');
+            await this.saveLog('WARNING', 'Verificación de código', email, 'Código incorrecto');
+            throw new HttpException('Código de verificación incorrecto', HttpStatus.BAD_REQUEST);
         }
         if (moment().isAfter(expiresAt)) {
             this.verificationCodes.delete(email); // Eliminar el código expirado
-            throw new Error('El código de verificación ha expirado');
+            await this.saveLog('WARNING', 'Verificación de código', email, 'Código expirado');
+            throw new HttpException('El código de verificación ha expirado', HttpStatus.BAD_REQUEST);
         }
 
         // El código es válido, eliminamos el código de la memoria
         this.verificationCodes.delete(email);
-
+        await this.saveLog('INFO', 'Verificación de código', email, 'Código verificado correctamente');
         return 'Código verificado correctamente';
     }
 
@@ -182,7 +199,8 @@ export class RecoverPasswordService {
         // Buscar al usuario por su correo en la base de datos
         const user = await this.userRepository.findOne({ where: { correo } });
         if (!user) {
-            throw new Error('Usuario no encontrado');
+            await this.saveLog('WARNING', 'Restablecer contraseña', correo, 'Usuario no encontrado');
+            throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
         }
 
         // Obtener el rol del usuario desde la vista de usuarios
@@ -196,21 +214,24 @@ export class RecoverPasswordService {
         if (userRole === 'empleado' || userRole === 'administrador') {
             const authorizedPersonnel = await this.authorizedPersonnelRepository.findOne({ where: { correo } });
             if (!authorizedPersonnel) {
-                throw new Error('Empleado o administrador no encontrado');
+                await this.saveLog('WARNING', 'Restablecer contraseña', correo, 'Empleado o administrador no encontrado');
+                throw new HttpException('Empleado o administrador no encontrado', HttpStatus.NOT_FOUND);
             }
             authorizedPersonnel.contrasena = hashedPassword;
             await this.authorizedPersonnelRepository.save(authorizedPersonnel);
         } else if (userRole === 'cliente') {
             const client = await this.clientRepository.findOne({ where: { correo } });
             if (!client) {
-                throw new Error('Cliente no encontrado');
+                await this.saveLog('WARNING', 'Restablecer contraseña', correo, 'Cliente no encontrado');
+                throw new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND);
             }
             client.contrasena = hashedPassword;
             await this.clientRepository.save(client);
         } else {
-            throw new Error('Rol de usuario no válido');
+            await this.saveLog('WARNING', 'Restablecer contraseña', correo, 'Rol de usuario no válido');
+            throw new HttpException('Rol de usuario no válido', HttpStatus.BAD_REQUEST);
         }
-
+        await this.saveLog('INFO', 'Restablecer contraseña', correo, 'Contraseña actualizada exitosamente');
         return 'Contraseña actualizada exitosamente';
     }
 }

@@ -9,7 +9,7 @@ export class LogEntity {
     timestamp: Date;  // Fecha y hora del evento
 
     @Column({ type: 'varchar', length: 10 })
-    level: string;  // Nivel del log (INFO, WARNING, ERROR)
+    level: string;  // Nivel del log (INFO, WARNING, ERROR,)etcétera
 
     @Column('text')
     message: string;  // Mensaje del evento

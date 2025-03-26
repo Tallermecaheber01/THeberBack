@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -40,7 +40,7 @@ import { Contact } from './admin/contact/entities/contacts.entity';
     ConfigModule.forRoot({
       isGlobal: true,  // Hacer las variables de entorno disponibles globalmente
     }),
-    TypeOrmModule.forRootAsync({
+    /*TypeOrmModule.forRootAsync({
       imports: [ConfigModule],  // Importamos ConfigModule
       inject: [ConfigService],  // Inyectamos ConfigService
       useFactory: async (configService: ConfigService) => ({
@@ -54,20 +54,24 @@ import { Contact } from './admin/contact/entities/contacts.entity';
           User, Feedback, ServiceEntity, BrandEntity, VehicleTypeEntity,
           AppointmentEntity, UserVehicleViewEntity, VehicleEntity, AppointmentServiceEntity,
           AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
-          CancelledAppointmentsViewEntity,LogEntity,ClientEntity,UserViewEntity,
-          AuthorizedPersonnelEntity,AppointmentWaitingViewEntity,AppointmentRejectionEntity,QuestionSecretEntity,
+          CancelledAppointmentsViewEntity, LogEntity, ClientEntity, UserViewEntity,
+          AuthorizedPersonnelEntity, AppointmentWaitingViewEntity, AppointmentRejectionEntity, QuestionSecretEntity,
           CorporateImage, Contact
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),
-    }),
-    UsersModule,
-    ClientModule,
+    }),*/
     AdminModule,
+    ClientModule,
+    UsersModule,
     EmployModule,
     PublicModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule implements OnModuleInit {
+  onModuleInit() {
+    console.log('Modulo app en uso')
+  }
+}
