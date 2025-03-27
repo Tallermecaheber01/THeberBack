@@ -121,12 +121,12 @@ export class LoginService {
     });
 
     res.cookie('authToken', token, {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+      sameSite: 'none', // Necesario para cookies de terceros
       maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
       path: '/',
-      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict', // Ajusta según tu necesidad
-      ...(process.env.NODE_ENV === 'production' && { domain: 'wheat-starling-827872.hostingersite.com' }),
-    });
+      httpOnly: false, // Para que sea accesible desde document.cookie
+  });
     
     
     
