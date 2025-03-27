@@ -122,11 +122,14 @@ export class LoginService {
 
     res.cookie('authToken', token, {
       secure: process.env.NODE_ENV === 'production',
-      //maxAge: 1000 * 60 * 60, // 1 hora
       maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
       path: '/',
-      sameSite:'strict'
-  });
+      sameSite: 'strict',
+      domain: process.env.NODE_ENV === 'production' ? '.wheat-starling-827872.hostingersite.com' : undefined,
+    });
+    
+    
+    
     
     
 
