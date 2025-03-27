@@ -124,9 +124,10 @@ export class LoginService {
       secure: process.env.NODE_ENV === 'production',
       maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
       path: '/',
-      sameSite: 'strict',
-      domain: process.env.NODE_ENV === 'production' ? '.wheat-starling-827872.hostingersite.com' : undefined,
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict', // Ajusta según tu necesidad
+      ...(process.env.NODE_ENV === 'production' && { domain: 'wheat-starling-827872.hostingersite.com' }),
     });
+    
     
     
     
