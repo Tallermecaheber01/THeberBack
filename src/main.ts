@@ -41,7 +41,9 @@ async function bootstrap() {
 
   // A01: Configuración restrictiva de CORS
   app.enableCors({
-    origin: ['https://wheat-starling-827872.hostingersite.com'],
+    origin: ['https://wheat-starling-827872.hostingersite.com',
+      'http://localhost:3001'
+    ],
     //origin: ['http://localhost:3001'], // Asegura que el frontend puede hacer solicitudes
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -52,7 +54,17 @@ async function bootstrap() {
 
   // Si tienes rutas estáticas, asegúrate de que también tengan los encabezados de seguridad:
   app.use('/static', (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://wheat-starling-827872.hostingersite.com');
+    const allowedOrigins = [
+      'https://wheat-starling-827872.hostingersite.com',
+      'http://localhost:3001'
+    ];
+    
+    // Verifica si el origen de la solicitud es uno de los permitidos
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+  
     // Aquí podrías agregar otros encabezados si es necesario, por ejemplo:
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
