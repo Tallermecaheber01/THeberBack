@@ -121,12 +121,14 @@ export class LoginService {
     });
 
     res.cookie('authToken', token, {
-      secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
-      sameSite: 'none', // Necesario para cookies de terceros
+      secure: true,  // Necesario para HTTPS
+      httpOnly: true, // Evita que JavaScript en el frontend acceda a la cookie
       maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
       path: '/',
-      httpOnly: false, // Para que sea accesible desde document.cookie
-  });
+      sameSite: 'none', // Permite el uso de cookies en diferentes dominios
+      domain: 'theberback.onrender.com', // Asegura que la cookie se asigne correctamente al dominio backend
+    });
+    
     
     
     
