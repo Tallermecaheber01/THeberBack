@@ -122,7 +122,6 @@ export class LoginService {
 
     res.cookie('authToken', token, {
       secure: true,  // Necesario para HTTPS
-      httpOnly: true, // Evita que JavaScript en el frontend acceda a la cookie
       maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
       path: '/',
       sameSite: 'none', // Permite el uso de cookies en diferentes dominios
