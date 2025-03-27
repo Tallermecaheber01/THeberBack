@@ -40,18 +40,17 @@ async function bootstrap() {
 
 
   // A01: Configuración restrictiva de CORS
-  app.enableCors({
-    origin: [
-      'https://therberfront.onrender.com',
-      'http://localhost:3001',  // Asegura que localhost sea aceptado
-      'https://theberback.onrender.com'
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Authorization'],
-    credentials: true,  // Asegúrate de que las cookies se envíen
-  });
-  
+app.enableCors({
+  origin: [
+    'https://therberfront.onrender.com', // Frontend en producción
+    'http://localhost:3001',  // Para pruebas en local
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization'],
+  credentials: true,  // 🔥 Clave para enviar cookies
+});
+
   
 
   // Si tienes rutas estáticas, asegúrate de que también tengan los encabezados de seguridad:
