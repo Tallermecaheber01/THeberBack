@@ -121,11 +121,11 @@ export class LoginService {
     });
 
     res.cookie('authToken', token, {
-      httpOnly: true,  // 🔹 Protege contra accesos desde JavaScript
-      secure: process.env.NODE_ENV === 'production',  // 🔹 Solo en HTTPS en producción
+      secure: process.env.NODE_ENV === 'production',
+      //maxAge: 1000 * 60 * 60, // 1 hora
       maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
       path: '/',
-      sameSite: 'strict'  // 🔹 Previene envío en solicitudes de terceros
+      sameSite:'strict'
   });
     
     
