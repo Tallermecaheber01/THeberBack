@@ -41,15 +41,17 @@ async function bootstrap() {
 
   // A01: Configuración restrictiva de CORS
   app.enableCors({
-    origin: ['https://wheat-starling-827872.hostingersite.com',
-      'http://localhost:3001'
+    origin: [
+      'https://wheat-starling-827872.hostingersite.com',
+      'http://localhost:3001',  // Asegura que localhost sea aceptado
+      'https://theberback.onrender.com'
     ],
-    //origin: ['http://localhost:3001'], // Asegura que el frontend puede hacer solicitudes
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Authorization'], // Permitir que el cliente vea Authorization en la respuesta
-    credentials: true,
+    exposedHeaders: ['Authorization'],
+    credentials: true,  // Asegúrate de que las cookies se envíen
   });
+  
   
 
   // Si tienes rutas estáticas, asegúrate de que también tengan los encabezados de seguridad:

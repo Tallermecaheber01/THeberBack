@@ -122,9 +122,12 @@ export class LoginService {
 
     res.cookie('authToken', token, {
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60,  // 1 minuto
+      httpOnly: true,
+      maxAge: 1000 * 60 * 15, // 15 minutos
       path: '/',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
+    
     
 
     return res.status(200).json({ success: true });
