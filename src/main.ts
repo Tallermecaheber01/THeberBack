@@ -27,7 +27,8 @@ async function bootstrap() {
           scriptSrc: ["'self'", "'unsafe-inline'"],
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: ["'self'", 'data:'],
-          connectSrc: ["'self'", 'http://localhost:3000'], // Asegura que las solicitudes sean aceptadas
+          connectSrc: ["'self'", 'https://theberback.onrender.com'],
+          //connectSrc: ["'self'", 'http://localhost:3000'], // Asegura que las solicitudes sean aceptadas
           frameAncestors: ["'none'"],
           formAction: ["'self'"],
         },
@@ -40,7 +41,8 @@ async function bootstrap() {
 
   // A01: Configuración restrictiva de CORS
   app.enableCors({
-    origin: ['http://localhost:3001'], // Asegura que el frontend puede hacer solicitudes
+    origin: ['https://wheat-starling-827872.hostingersite.com'],
+    //origin: ['http://localhost:3001'], // Asegura que el frontend puede hacer solicitudes
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Authorization'], // Permitir que el cliente vea Authorization en la respuesta
@@ -50,7 +52,7 @@ async function bootstrap() {
 
   // Si tienes rutas estáticas, asegúrate de que también tengan los encabezados de seguridad:
   app.use('/static', (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.setHeader('Access-Control-Allow-Origin', 'https://wheat-starling-827872.hostingersite.com');
     // Aquí podrías agregar otros encabezados si es necesario, por ejemplo:
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
