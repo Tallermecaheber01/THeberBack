@@ -181,13 +181,13 @@ export class LoginService {
         console.log(`🔑 Token generado para: ${userType} | Tiempo de expiración: ${expiresIn} | Hora de creación: ${currentTime}`);
 
         res.cookie('authToken', token, {
-            //secure: process.env.NODE_ENV === 'production', // Solo funciona en HTTPS en producción
-            secure: true,
-            sameSite:'none', // Protección contra CSRF
-            maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
-            path: '/',
-            httpOnly: false, // Permite acceso desde document.cookie
+          secure: true, // Solo HTTPS
+          sameSite: 'none', // Permite compartir cookies entre diferentes dominios
+          httpOnly: false, // Bloquea acceso desde JavaScript
+          path: '/',
+          expires: new Date(Date.now() + (user.rol === 'cliente' ? 60 * 60 * 1000 : 30 * 60 * 1000)),
         });
+
         // 🔹 Guardar log de sesión exitosa
         //await this.saveLog('INFO', 'Login', user.correo, `Inicio de sesión exitoso`);
         console.log('Inicio de sesion realizado correctamente', { userId: correo, file: 'login.service.ts' })
