@@ -180,14 +180,14 @@ export class LoginService {
         // Imprimir en consola el mensaje solicitado con la hora exacta en la zona horaria de México
         console.log(`🔑 Token generado para: ${userType} | Tiempo de expiración: ${expiresIn} | Hora de creación: ${currentTime}`);
 
-        res.cookie('authToken', token, {
-  secure: true,       // Necesario para producción en HTTPS
-  sameSite: 'none',   // Permite cookies de terceros
-  httpOnly: false,    // Permite acceso desde document.cookie
-  path: '/',
-  domain: 'https://theberback.onrender.com', // Usa el dominio correcto si es necesario
-  expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hora de duración
-});
+  res.cookie('authToken', token, {
+            //secure: process.env.NODE_ENV === 'production', // Solo funciona en HTTPS en producción
+            secure: true,
+            sameSite:'none', // Protección contra CSRF
+            maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
+            path: '/',
+            httpOnly: false, // Permite acceso desde document.cookie
+        });
 
 
         // 🔹 Guardar log de sesión exitosa
