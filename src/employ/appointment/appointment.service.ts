@@ -169,7 +169,7 @@ export class AppointmentService {
     async getAllUsersWithVehicles(): Promise<
         {
             user_id: number;
-            user_nombre: string;
+            user_nombre_completo: string;
             vehicles: {
                 vehicle_marca: string;
                 modelos: {
@@ -183,7 +183,7 @@ export class AppointmentService {
     > {
         // Obtener todos los usuarios con rol 'client'
         const users = await this.clientRepository.find({
-            select: ['id', 'nombre']
+            select: ['id', 'nombre', 'apellido_paterno', 'apellido_materno']
         });
 
         // Obtener todos los vehículos de esos usuarios
@@ -191,6 +191,9 @@ export class AppointmentService {
             const vehicles = await this.userVehicleRepository.find({
                 where: { idCliente: user.id }
             });
+
+            // Concatenar nombre completo
+            const user_nombre_completo = `${user.nombre} ${user.apellido_paterno} ${user.apellido_materno}`.trim();
 
             // Agrupar vehículos por marca
             const vehiclesGroupedByMarca: Record<string, {
@@ -220,7 +223,7 @@ export class AppointmentService {
 
             return {
                 user_id: user.id,
-                user_nombre: user.nombre,
+                user_nombre_completo,
                 vehicles: Object.values(vehiclesGroupedByMarca)
             };
         }));
@@ -228,25 +231,30 @@ export class AppointmentService {
         return usersWithVehicles;
     }
 
+
     //Método para obtener usuarios con el rol 'employ'
     async getAllEmployees() {
-        // Obtener todos los usuarios con rol 'employ'
         const employees = await this.employRepository.find({
-            where: { rol: In(['empleado', 'administrador'])},
-            select: ['id', 'nombre']
+            where: { rol: In(['empleado', 'administrador']) },
+            select: ['id', 'nombre', 'apellido_paterno', 'apellido_materno']
         });
-        return employees;
+
+        return employees.map(emp => ({
+            id: emp.id,
+            nombre_completo: `${emp.nombre} ${emp.apellido_paterno} ${emp.apellido_materno}`.trim()
+        }));
     }
+
 
     async getClientById(id: number) {
         const client = await this.clientRepository.findOne({
-          where: { id },
-          select: ['id', 'nombre', 'apellido_materno', 'apellido_paterno']
+            where: { id },
+            select: ['id', 'nombre', 'apellido_materno', 'apellido_paterno']
         });
         return client;
-      }
-      
-  
+    }
+
+
 
     async getAllServices() {
         const services = await this.serviceRepository.find({
@@ -413,47 +421,47 @@ export class AppointmentService {
         updateData: UpdateAppointmentDto
     ): Promise<AppointmentEntity> {
         console.log('📩 Datos recibidos para actualizar:', updateData);
-    
+
         // Buscar la cita con estado "confirmada"
         const appointment = await this.appointmentRepository.findOne({
             where: { id: appointmentId, estado: In(['confirmada', 'asignada']) },
             relations: ['empleado']
         });
-    
+
         if (!appointment) {
             throw new Error(`❌ No se encontró la cita con estado "confirmada" y ID ${appointmentId}.`);
         }
-    
+
         console.log('🔍 Cita encontrada:', appointment);
-    
+
         // Si se proporciona un nuevo IdPersonal, buscar el empleado en la BD
         if (updateData.IdPersonal !== undefined) {
             const empleado = await this.employRepository.findOne({
                 where: { id: updateData.IdPersonal },
             });
-    
+
             if (!empleado) {
                 throw new Error(`❌ No se encontró el empleado con ID ${updateData.IdPersonal}.`);
             }
-    
+
             console.log('👨‍🔧 Empleado encontrado:', empleado);
             appointment.empleado = empleado;  // Asignar la relación con el empleado
         }
-    
+
         // Actualizar otros valores
         appointment.total = updateData.total ?? appointment.total;
         appointment.estado = updateData.estado ?? appointment.estado;
-    
+
         console.log('📌 Entidad antes de guardar:', appointment);
-    
+
         // Guardar cambios en la BD
         const savedAppointment = await this.appointmentRepository.save(appointment);
-    
+
         console.log('✅ Cita actualizada y guardada:', savedAppointment);
-    
+
         return savedAppointment;
     }
-    
+
 
     async getCancelledAppointments(): Promise<any[]> {
         // Obtener todas las citas canceladas sin filtrar por estado

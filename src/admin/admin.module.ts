@@ -28,6 +28,8 @@ import { UserViewEntity } from 'src/public/register/view/vw-users-entity';
 import { UserVehicleViewEntity } from 'src/employ/entities-view/user-vehicle.view.entity';
 import { RepairEntity } from 'src/employ/repair/entities/repair.entity';
 import { CancelledAppointmentsViewEntity } from 'src/employ/entities-view/appointments_cancelled_view';
+import { Police } from './policies/entities/policies.entity';
+import { PoliceService } from './policies/policies.service';
 
 @Module({
   imports: [
@@ -46,7 +48,7 @@ import { CancelledAppointmentsViewEntity } from 'src/employ/entities-view/appoin
           AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
           AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
           QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity,UserVehicleViewEntity,RepairEntity,
-          CancelledAppointmentsViewEntity
+          CancelledAppointmentsViewEntity, Police
         ],
         synchronize: false,
       }),
@@ -56,11 +58,11 @@ import { CancelledAppointmentsViewEntity } from 'src/employ/entities-view/appoin
       AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
       AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
       QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity,UserVehicleViewEntity,RepairEntity,
-      CancelledAppointmentsViewEntity
+      CancelledAppointmentsViewEntity, Police
     ]),
   ],
   controllers: [AdminController],
-  providers: [ServiceService, ContactService, CorporateimageService,],
+  providers: [ServiceService, ContactService, CorporateimageService, PoliceService],
   exports: [ServiceService, CorporateimageService], // Exporta si se necesita en otros módulos
 })
 export class AdminModule implements OnModuleInit {

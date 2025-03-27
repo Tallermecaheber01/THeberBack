@@ -7,20 +7,27 @@ import { CreateBrandDto } from './service/dto/create-brand.dto';
 import { CreateVehicleDto } from './service/dto/create-vechicle.dto';
 import { CreateContactDto } from './contact/dto/create-contacts.dto';
 
+
 import { UpdateServiceDto } from './service/dto/update-service.dto';
 import { UpdateBrandDto } from './service/dto/update-brand.dto';
 import { UpdateVehicleDto } from './service/dto/update-vehicle.dto';
 import { UpdateCorporateImageDto } from './corporateimage/dto/update-corporateimage.dto';
 import { UpdateContactDto } from './contact/dto/update-contacts.dto';
+import { CreatePoliceDto } from './policies/dto/create-policies.dto';
+import { UpdatePoliceDto } from './policies/dto/update-policies.dto'; 
+
+
 
 import { ServiceEntity } from './service/entities/service.entity';
 import { BrandEntity } from './service/entities/brand.entity';
 import { VehicleTypeEntity } from './service/entities/vehicle.entity';
 import { CorporateImage } from './corporateimage/entities/corporateimage.entity';
 import { Contact } from './contact/entities/contacts.entity';
+import { Police } from './policies/entities/policies.entity';
 
 import { CorporateimageService } from './corporateimage/corporateimage.service';
 import { ContactService } from './contact/contact.service';
+import { PoliceService } from './policies/policies.service';
 
 @Controller('admin')
 export class AdminController {
@@ -28,6 +35,7 @@ export class AdminController {
         private readonly serviceService: ServiceService, 
         private readonly corporateimageService: CorporateimageService,
         private readonly contactService: ContactService, 
+        private readonly policeService: PoliceService,
     ) {}
 
 
@@ -156,5 +164,44 @@ export class AdminController {
     async deleteContact(@Param('id') id: number): Promise<void> {
       await this.contactService.remove(id);
     }
+
+    
+@Post('new-police')
+async createPolice(
+  @Body(new ValidationPipe()) createPoliceDto: CreatePoliceDto,
+): Promise<Police> {
+  return this.policeService.create(createPoliceDto);
+}
+
+@Patch('update-police/:id')
+async updatePolice(
+  @Param('id', ParseIntPipe) id: number,
+  @Body(new ValidationPipe()) updatePoliceDto: UpdatePoliceDto,
+): Promise<Police> {
+  return this.policeService.update(id, updatePoliceDto);
+}
+
+@Get('all-polices')
+async getAllPolices(): Promise<Police[]> {
+  return this.policeService.findAll();
+}
+
+@Get('police/:id')
+async getPoliceById(
+  @Param('id', ParseIntPipe) id: number,
+): Promise<Police> {
+  return this.policeService.findOneById(id);
+}
+
+@Delete('delete-police/:id')
+async deletePolice(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  await this.policeService.remove(id);
+}
+
+@Patch('update-status/:id')
+async updateStatus(@Param('id', ParseIntPipe) id: number): Promise<Police> {
+  return this.policeService.actualizarEstado(id);
+}
+
 
 }
