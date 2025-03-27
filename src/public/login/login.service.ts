@@ -181,12 +181,14 @@ export class LoginService {
         console.log(`🔑 Token generado para: ${userType} | Tiempo de expiración: ${expiresIn} | Hora de creación: ${currentTime}`);
 
         res.cookie('authToken', token, {
-          secure: true, // Solo HTTPS
-          sameSite: 'none', // Permite compartir cookies entre diferentes dominios
-          httpOnly: false, // Bloquea acceso desde JavaScript
-          path: '/',
-          expires: new Date(Date.now() + (user.rol === 'cliente' ? 60 * 60 * 1000 : 30 * 60 * 1000)),
-        });
+  secure: true,       // Necesario para producción en HTTPS
+  sameSite: 'none',   // Permite cookies de terceros
+  httpOnly: false,    // Permite acceso desde document.cookie
+  path: '/',
+  domain: 'https://theberback.onrender.com', // Usa el dominio correcto si es necesario
+  expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hora de duración
+});
+
 
         // 🔹 Guardar log de sesión exitosa
         //await this.saveLog('INFO', 'Login', user.correo, `Inicio de sesión exitoso`);
