@@ -46,7 +46,7 @@ export class PublicController {
     }
 
     @Get(':email')
-    @Roles('administrador', 'cliente')
+    @Roles('administrador', 'cliente', 'empleado')
     @UseGuards(AuthGuard, RoleGuard)  // Primero AuthGuard para verificar el token
     async getUserByEmail(@Param('email') email: string): Promise<UserViewEntity> {
         return this.informationService.getUserByEmail(email);
