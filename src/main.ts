@@ -44,7 +44,7 @@ app.enableCors({
   origin: [
     'https://therberfront.onrender.com', // Frontend en producción
     'http://localhost:3001', 
-    'https://wheat-starling-827872.hostingersite.com/' 
+    'https://wheat-starling-827872.hostingersite.com' 
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -58,7 +58,8 @@ app.enableCors({
   app.use('/static', (req, res, next) => {
     const allowedOrigins = [
       'https://therberfront.onrender.com',
-      'http://localhost:3001'
+      'http://localhost:3001',
+      'https://wheat-starling-827872.hostingersite.com'
     ];
     
     // Verifica si el origen de la solicitud es uno de los permitidos
