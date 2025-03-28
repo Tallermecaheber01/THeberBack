@@ -43,7 +43,8 @@ async function bootstrap() {
 app.enableCors({
   origin: [
     'https://therberfront.onrender.com', // Frontend en producción
-    'http://localhost:3001',  // Para pruebas en local
+    'http://localhost:3001', 
+    'https://wheat-starling-827872.hostingersite.com/' 
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
