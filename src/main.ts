@@ -82,7 +82,7 @@ app.enableCors({
   try {
     await app.listen(3000);
     //throw new Error('¡Error de prueba!');
-    logger.log('La aplicación se ha arrancado', 'Bootstrap'); // Usando log en lugar de console.log
+    logger.log('La aplicación se ha arrancado wui', 'Bootstrap'); // Usando log en lugar de console.log
   } catch (error) {
     logger.error('La aplicación no se ha arrancado debido a un error', { file: 'main.ts', line: 66 });
   }

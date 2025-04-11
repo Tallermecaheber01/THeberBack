@@ -30,6 +30,9 @@ import { RepairEntity } from 'src/employ/repair/entities/repair.entity';
 import { CancelledAppointmentsViewEntity } from 'src/employ/entities-view/appointments_cancelled_view';
 import { Police } from './policies/entities/policies.entity';
 import { PoliceService } from './policies/policies.service';
+import { JwtModule } from '@nestjs/jwt';
+import { LoggerService } from 'src/services/logger/logger.service';
+
 
 @Module({
   imports: [
@@ -47,7 +50,7 @@ import { PoliceService } from './policies/policies.service';
         entities: [ServiceEntity, BrandEntity, VehicleTypeEntity, CorporateImage, Contact, LogEntity,
           AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
           AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
-          QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity,UserVehicleViewEntity,RepairEntity,
+          QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
           CancelledAppointmentsViewEntity, Police
         ],
         synchronize: false,
@@ -57,12 +60,16 @@ import { PoliceService } from './policies/policies.service';
     TypeOrmModule.forFeature([ServiceEntity, BrandEntity, VehicleTypeEntity, CorporateImage, Contact, LogEntity,
       AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
       AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
-      QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity,UserVehicleViewEntity,RepairEntity,
+      QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
       CancelledAppointmentsViewEntity, Police
     ]),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { /*expiresIn: '1h'*/ },
+    })
   ],
   controllers: [AdminController],
-  providers: [ServiceService, ContactService, CorporateimageService, PoliceService],
+  providers: [ServiceService, ContactService, CorporateimageService, PoliceService,LoggerService],
   exports: [ServiceService, CorporateimageService], // Exporta si se necesita en otros módulos
 })
 export class AdminModule implements OnModuleInit {

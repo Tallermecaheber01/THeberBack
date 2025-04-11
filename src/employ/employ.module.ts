@@ -5,12 +5,12 @@ import { EmployController } from './employ.controller';
 //Servicios
 import { AppointmentService } from './appointment/appointment.service';
 import { RepairService } from './repair/repair.service';
+import { LoggerService } from 'src/services/logger/logger.service';
 
 //Entidades que son las tablas en la base de datos
 import { AppointmentEntity } from './appointment/entities/appointment.entity';
 import { AppointmentServiceEntity } from './appointment/entities/appointment-services';
 import { AppointmentServicesViewEntity } from './entities-view/appointment_services_view';
-import { User } from 'src/users/entity/user.entity';
 import { UserVehicleViewEntity } from './entities-view/user-vehicle.view.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { RepairEntity } from './repair/entities/repair.entity';
@@ -25,6 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
 import { QuestionSecretEntity } from 'src/public/register/entity/question-secret.entity';
 import { Contact } from 'src/admin/contact/entities/contacts.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { LogEntity } from 'src/log/entity/log.entity';
 
 @Module({
   imports: [
@@ -39,24 +41,28 @@ import { Contact } from 'src/admin/contact/entities/contacts.entity';
         username: configService.get<string>('DB_USERNAME_EMPLOY'),
         password: configService.get<string>('DB_PASSWORD_EMPLOY'),
         database: configService.get<string>('DB_NAME'),
-        entities: [AppointmentEntity, User, UserVehicleViewEntity, ServiceEntity,
+        entities: [AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
           AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact
+          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact,LogEntity
         ],
         synchronize: false,
       }),
       inject: [ConfigService]
     }),
     TypeOrmModule.forFeature([
-      AppointmentEntity, User, UserVehicleViewEntity, ServiceEntity,
+      AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
       AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
       CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact
-    ])
+      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact,LogEntity
+    ]),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { /*expiresIn: '1h'*/ },
+    })
   ],
   controllers: [EmployController],
-  providers: [AppointmentService, RepairService],
+  providers: [AppointmentService, RepairService, LoggerService],
   exports: [AppointmentService]
 })
 export class EmployModule implements OnModuleInit {

@@ -1,6 +1,5 @@
 import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { InformationService } from './information/information.service';
-import { User } from 'src/users/entity/user.entity';
 //import { VehiclesService } from './vehicles/vehicles.service';
 
 @Controller('client')

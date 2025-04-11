@@ -1,12 +1,19 @@
 import * as jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const SECRET_KEY = 'dff3c7ef5be6b1dfa77350c0eeb786c529ecc1312f4660b794cbcc1562ef924a'; // ⚠️ Usa variables de entorno en producción
+dotenv.config();
+
+
+const SECRET_KEY = process.env.JWT_SECRET;
+if (!SECRET_KEY) {
+  throw new Error('JWT_SECRET no está definido en las variables de entorno');
+}
 
 export function decodeToken(token: string): any {
   try {
-    return jwt.verify(token, SECRET_KEY); // 📌 Decodifica el token
+    return jwt.verify(token, SECRET_KEY);
   } catch (error) {
-    console.error('❌ ERROR: Token inválido o expirado');
+    console.error('ERROR: Token inválido o expirado', error);
     return null;
   }
 }

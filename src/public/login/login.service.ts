@@ -33,15 +33,15 @@ export class LoginService {
     ) { }
 
     // Función para registrar logs
-    async saveLog(level: string, message: string, user: string, extraInfo?: string) {
-        await this.logRepository.save({
-            level,
-            message,
-            user,
-            extraInfo,
-            timestamp: new Date(),
-        });
-    }
+    /* async saveLog(level: string, message: string, user: string, extraInfo?: string) {
+         await this.logRepository.save({
+             level,
+             message,
+             user,
+             extraInfo,
+             timestamp: new Date(),
+         });
+     }*/
 
     // Método para manejar el login
     async login(loginDto: LoginDto, @Res() res: Response) {
@@ -123,7 +123,7 @@ export class LoginService {
                     client.estado = "bloqueado";
                     client.fechaDesbloqueo = new Date(new Date().getTime() + 5 * 60 * 1000); // Bloqueo de 5 minutos
                     this.logger.warn('Cuenta del cliente bloqueada temporalmente por exceder limite de intentos', { userId: correo, file: 'login.service.ts', line: 125 });
-                    await this.saveLog('ERROR', 'Login', correo, `Cuenta bloqueada temporalmente`);
+                    //await this.saveLog('ERROR', 'Login', correo, `Cuenta bloqueada temporalmente`);
                 }
 
                 await this.clientRepository.save(client);
@@ -180,10 +180,10 @@ export class LoginService {
         // Imprimir en consola el mensaje solicitado con la hora exacta en la zona horaria de México
         console.log(`🔑 Token generado para: ${userType} | Tiempo de expiración: ${expiresIn} | Hora de creación: ${currentTime}`);
 
-  res.cookie('authToken', token, {
+        res.cookie('authToken', token, {
             //secure: process.env.NODE_ENV === 'production', // Solo funciona en HTTPS en producción
             secure: true,
-            sameSite:'none', // Protección contra CSRF
+            sameSite: 'none', // Protección contra CSRF
             maxAge: user.rol === 'cliente' ? 1000 * 60 * 60 : 1000 * 60 * 30,
             path: '/',
             httpOnly: false, // Permite acceso desde document.cookie
@@ -192,8 +192,7 @@ export class LoginService {
 
         // 🔹 Guardar log de sesión exitosa
         //await this.saveLog('INFO', 'Login', user.correo, `Inicio de sesión exitoso`);
-        console.log('Inicio de sesion realizado correctamente', { userId: correo, file: 'login.service.ts' })
-
+        this.logger.log('Inicio de sesion realizado correctamente', { userId: correo, file: 'login.service.ts', message:'Inicio de sesion realizado correctamente' })
         return res.status(200).json({
             success: true,
             token: token,  // Retorna el token generado

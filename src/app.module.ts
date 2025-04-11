@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config'; // Importar ConfigModule y ConfigService
-import { UsersModule } from './users/users.module';
 
 // Módulos
 import { ClientModule } from './client/client.module';
@@ -19,8 +18,6 @@ import { VehicleTypeEntity } from './admin/service/entities/vehicle.entity';
 import { AppointmentEntity } from './employ/appointment/entities/appointment.entity';
 import { AppointmentServiceEntity } from './employ/appointment/entities/appointment-services';
 import { AppointmentServicesViewEntity } from './employ/entities-view/appointment_services_view';
-import { Feedback } from './users/entity/feedback.entity';
-import { User } from './users/entity/user.entity';
 import { UserVehicleViewEntity } from './employ/entities-view/user-vehicle.view.entity';
 import { VehicleEntity } from './client/vehicles/entities/vehicle.entity';
 import { RepairEntity } from './employ/repair/entities/repair.entity';
@@ -63,7 +60,6 @@ import { Contact } from './admin/contact/entities/contacts.entity';
     }),*/
     AdminModule,
     ClientModule,
-    UsersModule,
     EmployModule,
     PublicModule,
   ],

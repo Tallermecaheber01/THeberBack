@@ -1,22 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
-@Entity('logs')  // Nombre de la tabla en la base de datos
+@Entity('logs')
 export class LogEntity {
-    @PrimaryGeneratedColumn()  // Esto generará automáticamente un campo 'id' como clave primaria
-    id: number;
+  @PrimaryGeneratedColumn()
+  id_log: number;
 
-    @Column({ type: 'timestamp' })
-    timestamp: Date;  // Fecha y hora del evento
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  fecha: Date;
 
-    @Column({ type: 'varchar', length: 10 })
-    level: string;  // Nivel del log (INFO, WARNING, ERROR,)etcétera
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  usuario: string;
 
-    @Column('text')
-    message: string;  // Mensaje del evento
+  @Column({
+    type: 'enum',
+    enum: ['INSERT', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'ERROR', 'OTRO'],
+    nullable: false,
+  })
+  accion: 'INSERT' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'ERROR' | 'OTRO';
 
-    @Column({ type: 'varchar', length: 100, nullable: true })
-    user: string | null;  // Usuario asociado (si aplica)
+  @Column({ type: 'varchar', length: 100, nullable: false })
+  tabla_afectada: string;
 
-    @Column('text', { nullable: true })
-    extraInfo: string;  // Asegúrate de que esta columna esté definida correctament
+  @Column({ type: 'text', nullable: true })
+  descripcion: string;
+
+  @Column({ type: 'varchar', length: 45, nullable: true })
+  ip_usuario: string;
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { ServiceEntity } from './entities/service.entity';
 import { BrandEntity } from './entities/brand.entity';
@@ -33,34 +33,34 @@ export class ServiceService {
     ) { }
 
     // Método privado para guardar logs
-    private async saveLog(level: string, message: string, extraInfo?: string) {
+    /*private async saveLog(level: string, message: string, extraInfo?: string) {
         await this.logRepository.save({
             level,
             message,
             extraInfo,
             timestamp: new Date(),
         });
-    }
+    }*/
 
 
     async createService(serviceData: CreateServiceDto): Promise<ServiceEntity> {
         const newService = this.serviceRepository.create(serviceData);
         // Log de creación exitosa de servicio
-        await this.saveLog('INFO', 'Servicio creado', `ID: ${newService.id}`);
+        //await this.saveLog('INFO', 'Servicio creado', `ID: ${newService.id}`);
         return this.serviceRepository.save(newService);
     }
 
     async createBrand(brandData: CreateBrandDto): Promise<BrandEntity> {
         const newBrand = this.brandRepository.create(brandData);
         // Log de creación exitosa de marca
-        await this.saveLog('INFO', 'Marca creada', `ID: ${newBrand.id}`);
+        //await this.saveLog('INFO', 'Marca creada', `ID: ${newBrand.id}`);
         return this.brandRepository.save(newBrand);
     }
 
     async createVehicleType(vehicleData: CreateVehicleDto): Promise<VehicleTypeEntity> {
         const newVehicleType = this.vehicleRepository.create(vehicleData);
         // Log de creación exitosa de tipo de vehículo
-        await this.saveLog('INFO', 'Tipo de vehículo creado', `nombre: ${newVehicleType.nombre}`);
+        //await this.saveLog('INFO', 'Tipo de vehículo creado', `nombre: ${newVehicleType.nombre}`);
         return this.vehicleRepository.save(newVehicleType);
     }
 
@@ -68,12 +68,12 @@ export class ServiceService {
         const service = await this.serviceRepository.findOne({ where: { id } });
         if (!service) {
             // Log de error si no se encuentra el servicio
-            await this.saveLog('ERROR', 'Servicio no encontrado para actualizar', `ID: ${id}`);
+            //await this.saveLog('ERROR', 'Servicio no encontrado para actualizar', `ID: ${id}`);
             throw new NotFoundException(`Servicio con ID ${id} no encontrado`);
         }
         Object.assign(service, updateData); // Actualiza solo los campos enviados
         // Log de actualización exitosa
-        await this.saveLog('INFO', 'Servicio actualizado', `ID: ${service.id}`);
+        //await this.saveLog('INFO', 'Servicio actualizado', `ID: ${service.id}`);
         return this.serviceRepository.save(service);
     }
 
@@ -84,7 +84,7 @@ export class ServiceService {
         }
         Object.assign(brand, updateData);
         // Log de actualización exitosa
-        await this.saveLog('INFO', 'Marca actualizada', `ID: ${brand.id}`);
+        //await this.saveLog('INFO', 'Marca actualizada', `ID: ${brand.id}`);
         return this.brandRepository.save(brand);
     }
 
@@ -95,7 +95,7 @@ export class ServiceService {
         }
         Object.assign(vehicle, updateData);
         // Log de actualización exitosa
-        await this.saveLog('INFO', 'Tipo de vehículo actualizado', `ID: ${vehicle.id}`);
+        //await this.saveLog('INFO', 'Tipo de vehículo actualizado', `ID: ${vehicle.id}`);
         return this.vehicleRepository.save(vehicle);
     }
 
@@ -107,7 +107,7 @@ export class ServiceService {
         const service = await this.serviceRepository.find({ where: { id } });
         if (!service) {
             // Log de error si no se encuentra el servicio
-            await this.saveLog('ERROR', 'Servicio no encontrado', `ID: ${id}`);
+            //await this.saveLog('ERROR', 'Servicio no encontrado', `ID: ${id}`);
             throw new NotFoundException(`Servicio con ID ${id} no encontrado`);
         }
         return service;
@@ -125,19 +125,19 @@ export class ServiceService {
     async deleteService(id: number): Promise<void> {
         await this.serviceRepository.delete(id);
         // Log de eliminación exitosa de servicio
-        await this.saveLog('INFO', 'Servicio eliminado', `ID: ${id}`);
+        //await this.saveLog('INFO', 'Servicio eliminado', `ID: ${id}`);
     }
 
     async deleteBrand(id: number): Promise<void> {
         await this.brandRepository.delete(id);
         // Log de eliminación exitosa de marca
-        await this.saveLog('INFO', 'Marca eliminada', `ID: ${id}`);
+        //await this.saveLog('INFO', 'Marca eliminada', `ID: ${id}`);
     }
 
     async deleteVehicleType(id: number): Promise<void> {
         await this.vehicleRepository.delete(id);
         // Log de eliminación exitosa de tipo de vehículo
-        await this.saveLog('INFO', 'Tipo de vehículo eliminado', `ID: ${id}`);
+        //await this.saveLog('INFO', 'Tipo de vehículo eliminado', `ID: ${id}`);
     }
 
 

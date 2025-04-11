@@ -12,6 +12,7 @@ import axios from 'axios';
 import { CreateClientDto } from './dto/create-client-dto';
 import { QuestionSecretEntity } from './entity/question-secret.entity';
 import { LogEntity } from 'src/log/entity/log.entity';
+import { LoggerService } from 'src/services/logger/logger.service';
 
 @Injectable()
 export class RegisterService {
@@ -28,10 +29,12 @@ export class RegisterService {
 
         @InjectRepository(LogEntity)
         private readonly logRepository: Repository<LogEntity>,
+
+        private readonly logger : LoggerService,
     ) { }
 
         //Funcion para registrar logs
-        async saveLog(level: string, message: string, user: string, extraInfo?: string) {
+        /*async saveLog(level: string, message: string, user: string, extraInfo?: string) {
             await this.logRepository.save({
                 level,
                 message,
@@ -39,7 +42,7 @@ export class RegisterService {
                 extraInfo,
                 timestamp: new Date(),
             });
-        }
+        }*/
 
     // Configura el transporte de nodemailer
     private transporter = nodemailer.createTransport({
@@ -59,14 +62,16 @@ export class RegisterService {
 
         // Verificar que el correo no esté vacío
         if (!correo || typeof correo !== 'string' || correo.trim() === '') {
-            await this.saveLog('ERROR', 'Correo inválido', correo, 'El correo proporcionado no es válido');
+            //await this.saveLog('ERROR', 'Correo inválido', correo, 'El correo proporcionado no es válido');
+            this.logger.error('Correo inválido', { correo, file: 'register.service.ts' });
             throw new Error('El correo proporcionado no es valido');
         }
 
         // Verificar si el correo ya está en uso en la base de datos
         const existingUser = await this.userViewRepository.findOne({ where: { correo } });
         if (existingUser) {
-            await this.saveLog('WARNING', 'Correo ya registrado', correo, 'El correo ya está registrado en la base de datos');
+            //await this.saveLog('WARNING', 'Correo ya registrado', correo, 'El correo ya está registrado en la base de datos');
+            this.logger.warn('Correo ya registrado', { correo, file: 'register.service.ts' });
             throw new Error('El correo ya está registrado en la base de datos');
         }
 
@@ -145,7 +150,8 @@ export class RegisterService {
         `,
             //text: `Tu código de verificación es: ${verificationCode}. Este código expira en 10 minutos.`,
         });
-        await this.saveLog('INFO', 'Código de verificación enviado', correo, `Código: ${verificationCode}`);
+        //await this.saveLog('INFO', 'Código de verificación enviado', correo, `Código: ${verificationCode}`);
+        this.logger.log('Código de verificación enviado', { correo, verificationCode, file: 'register.service.ts' });
         return 'Correo con código de verificación enviado';
     }
 
@@ -153,7 +159,8 @@ export class RegisterService {
         // Verificar si el código existe para el correo
         const storedData = this.verificationCodes.get(correo);
         if (!storedData) {
-            await this.saveLog('ERROR', 'Código no encontrado', correo, 'No se encontró un código de verificación para este correo');
+            //await this.saveLog('ERROR', 'Código no encontrado', correo, 'No se encontró un código de verificación para este correo');
+            this.logger.error('Código no encontrado', { correo, file: 'register.service.ts' });
             return { success: false, message: 'No se encontró un código de verificación para este correo' };
         }
 
@@ -161,20 +168,23 @@ export class RegisterService {
 
         // Verificar si el código ingresado es correcto
         if (storedCode !== code) {
-            await this.saveLog('WARNING', 'Código incorrecto', correo, `Código ingresado: ${code}`);
+            //await this.saveLog('WARNING', 'Código incorrecto', correo, `Código ingresado: ${code}`);
+            this.logger.warn('Código incorrecto', { correo, code, file: 'register.service.ts' });
             return { success: false, message: 'Código de verificación incorrecto' };
         }
 
         // Verificar si el código ha expirado
         if (moment().isAfter(expiresAt)) {
             this.verificationCodes.delete(correo); // Eliminar el código expirado
-            await this.saveLog('ERROR', 'Código expirado', correo, `Código expirado: ${code}`);
+            //await this.saveLog('ERROR', 'Código expirado', correo, `Código expirado: ${code}`);
+            this.logger.error('Código expirado', { correo, code, file: 'register.service.ts' });
             return { success: false, message: 'El código de verificación ha expirado' };
         }
 
         // El código es válido, eliminamos el código de la memoria
         this.verificationCodes.delete(correo);
-        await this.saveLog('INFO', 'Código verificado', correo, `Código: ${code}`);
+        //await this.saveLog('INFO', 'Código verificado', correo, `Código: ${code}`);
+        this.logger.log('Código verificado correctamente', { correo, code, file: 'register.service.ts' });
         return { success: true, message: 'Código verificado correctamente' };
     }
 
@@ -184,7 +194,8 @@ export class RegisterService {
 
         const isCompromised = await this.checkPasswordPwned(contrasena);
         if (isCompromised) {
-            await this.saveLog('ERROR', 'Contraseña comprometida', '', 'La contraseña ha sido comprometida en una brecha de seguridad');
+            //await this.saveLog('ERROR', 'Contraseña comprometida', '', 'La contraseña ha sido comprometida en una brecha de seguridad');
+            this.logger.error('Contraseña comprometida', { file: 'register.service.ts' });
             throw new Error('La contraseña ha sido comprometida en una brecha de seguridad. Por favor, elige otra.');
         }
 
@@ -195,10 +206,12 @@ export class RegisterService {
             const newUser = this.clientRepository.create(userData);
             const savedUser = await this.clientRepository.save(newUser);
 
-            await this.saveLog('INFO', 'Usuario creado', '', `Usuario: ${savedUser.correo}`);
+            //await this.saveLog('INFO', 'Usuario creado', '', `Usuario: ${savedUser.correo}`);
+            this.logger.log('Usuario creado', { userId: savedUser.correo, file: 'register.service.ts' });
             return savedUser;
         } catch (error) {
-            await this.saveLog('ERROR', 'Error al crear usuario', '', error.message);
+            //await this.saveLog('ERROR', 'Error al crear usuario', '', error.message);
+             this.logger.error('Error al crear usuario', { error: error.message, file: 'register.service.ts' });
             throw new Error('Hubo un error al crear el usuario');
         }
     }
@@ -223,6 +236,7 @@ export class RegisterService {
             const regex = new RegExp(`^${hashSuffix}:`, 'm');
             return regex.test(data);
         } catch (error) {
+            this.logger.error('Error al verificar la contraseña', { error: error.message, file: 'register.service.ts' });
             throw new Error('Hubo un error al verificar la contraseña. Intenta nuevamente.');
         }
     }

@@ -15,21 +15,21 @@ export class CorporateimageService {
     private readonly logRepository: Repository<LogEntity>,
   ) { }
 
-  private async saveLog(level: string, message: string, extraInfo?: string) {
+  /*private async saveLog(level: string, message: string, extraInfo?: string) {
     await this.logRepository.save({
       level,
       message,
       extraInfo,
       timestamp: new Date(),
     });
-  }
+  }*/
 
   // Método para actualizar el título y la descripción de una CorporateImage
   async update(id: number, updateDto: UpdateCorporateImageDto): Promise<CorporateImage> {
     const corporateImage = await this.corporateImageRepository.findOne({ where: { id } });
     if (!corporateImage) {
       // Log de error cuando no se encuentra la imagen
-      await this.saveLog('ERROR', 'CorporateImage no encontrada para actualizar', `ID: ${id}`);
+      //await this.saveLog('ERROR', 'CorporateImage no encontrada para actualizar', `ID: ${id}`);
       throw new NotFoundException(`CorporateImage con id ${id} no fue encontrada`);
     }
     // Actualizamos los campos recibidos en el DTO
@@ -47,7 +47,7 @@ export class CorporateimageService {
 
     if (!corporateImage) {
        // Log de error cuando no se encuentra la imagen
-      await this.saveLog('ERROR', 'CorporateImage no encontrada', `ID: ${id}`);
+      //await this.saveLog('ERROR', 'CorporateImage no encontrada', `ID: ${id}`);
       throw new NotFoundException(`CorporateImage con id ${id} no fue encontrada`);
     }
 

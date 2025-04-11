@@ -8,7 +8,6 @@ import { AppointmentServicesViewEntity } from '../entities-view/appointment_serv
 import { AppointmentRejectionEntity } from './entities/appointment-rejection-entity';
 import { CancelledAppointmentsViewEntity } from '../entities-view/appointments_cancelled_view';
 import { UserVehicleViewEntity } from '../entities-view/user-vehicle.view.entity';
-import { User } from 'src/users/entity/user.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 
 import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';

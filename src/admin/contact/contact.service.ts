@@ -17,20 +17,20 @@ export class ContactService {
   ) { }
 
   // Método para guardar logs
-  private async saveLog(level: string, message: string, extraInfo?: string) {
+  /*private async saveLog(level: string, message: string, extraInfo?: string) {
     await this.logRepository.save({
       level,
       message,
       extraInfo,
       timestamp: new Date(),
     });
-  }
+  }*/
 
   // Método para crear un nuevo contacto
   async create(createContactDto: CreateContactDto): Promise<Contact> {
     const contact = this.contactRepository.create(createContactDto);
     // Log para la creación de un contacto
-    await this.saveLog('INFO', 'Nuevo contacto creado', `Nombre: ${contact.nombre}`);
+    //await this.saveLog('INFO', 'Nuevo contacto creado', `Nombre: ${contact.nombre}`);
     return this.contactRepository.save(contact);
   }
 
@@ -40,14 +40,14 @@ export class ContactService {
 
     if (!contact) {
       // Log para el error de no encontrar el contacto
-      await this.saveLog('ERROR', 'Contacto no encontrado para actualizar', `ID: ${id}`);
+      //await this.saveLog('ERROR', 'Contacto no encontrado para actualizar', `ID: ${id}`);
       throw new NotFoundException(`Contacto con id ${id} no encontrado`);
     }
 
     // Actualiza el contacto con los nuevos datos
     Object.assign(contact, updateContactDto);
     // Log para la actualización de un contacto
-    await this.saveLog('INFO', 'Contacto actualizado', `ID: ${updateContactDto.nombre}`)
+    //await this.saveLog('INFO', 'Contacto actualizado', `ID: ${updateContactDto.nombre}`)
     return this.contactRepository.save(contact);
   }
 
@@ -62,13 +62,13 @@ export class ContactService {
 
     if (!contact) {
       // Log para el error de no encontrar el contacto
-      await this.saveLog('ERROR', 'Contacto no encontrado para eliminar', `ID: ${id}`);
+      //await this.saveLog('ERROR', 'Contacto no encontrado para eliminar', `ID: ${id}`);
       throw new NotFoundException(`Contacto con id ${id} no encontrado`);
     }
 
     await this.contactRepository.remove(contact);
     // Log para la eliminación del contacto
-    await this.saveLog('INFO', 'Contacto eliminado', `ID: ${contact.id}`);
+    //await this.saveLog('INFO', 'Contacto eliminado', `ID: ${contact.id}`);
   }
 
   // Método para obtener un contacto por id
@@ -77,12 +77,12 @@ export class ContactService {
 
     if (!contact) {
       // Log para el error de no encontrar el contacto
-      await this.saveLog('ERROR', 'Contacto no encontrado', `ID: ${id}`);
+      //await this.saveLog('ERROR', 'Contacto no encontrado', `ID: ${id}`);
       throw new NotFoundException(`Contacto con id ${id} no encontrado`);
     }
 
     // Log para la obtención de un contacto por id
-    await this.saveLog('INFO', 'Contacto obtenido por ID', `ID: ${contact.id}`);
+    //await this.saveLog('INFO', 'Contacto obtenido por ID', `ID: ${contact.id}`);
     return contact;
   }
 

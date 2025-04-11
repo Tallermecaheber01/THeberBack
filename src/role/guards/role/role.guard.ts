@@ -22,6 +22,8 @@ export class RoleGuard implements CanActivate {
     console.log('User recibido:', user);  // Esto imprimirá la información del usuario que viene en la solicitud
 
     const hasRole = () => roles.includes(user.role);  // Cambiado a `user.role`
+    const userEmail = user.email;
+    console.log(userEmail)
 
     return user && user.role && hasRole();  // Cambiado a `user.role`
   }
