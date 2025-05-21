@@ -1,11 +1,9 @@
 import { Controller, Delete, Get, Param } from '@nestjs/common';
-import { InformationService } from './information/information.service';
 //import { VehiclesService } from './vehicles/vehicles.service';
 
 @Controller('client')
 export class ClientController {
   constructor(
-    private readonly informationService: InformationService,
    // private readonly vehicleService: VehiclesService
   ) { }
 

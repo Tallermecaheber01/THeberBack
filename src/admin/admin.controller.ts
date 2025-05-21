@@ -33,7 +33,6 @@ import { Roles } from 'src/role/role.decorator';
 import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { RoleGuard } from 'src/role/guards/role/role.guard';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LogEntity } from 'src/log/entity/log.entity';
 import { Repository } from 'typeorm';
 
 @Controller('admin')
@@ -45,8 +44,7 @@ export class AdminController {
     private readonly policeService: PoliceService,
     private logger: LoggerService,
 
-    @InjectRepository(LogEntity)
-    private readonly logRepository: Repository<LogEntity>,
+    
 
   ) { }
 
@@ -58,18 +56,7 @@ export class AdminController {
     @Body(new ValidationPipe()) serviceData: CreateServiceDto,
     @Request() req: any
   ): Promise<ServiceEntity> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
 
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'INSERT',  // Acción que describe la creación
-      tabla_afectada: 'services',
-      descripcion: 'Creacion de un nuevo servicio',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);  // Guardar log en la base de datos
     return this.serviceService.createService(serviceData);
   }
 
@@ -81,18 +68,7 @@ export class AdminController {
     @Body(new ValidationPipe) brandData: CreateBrandDto,
     @Request() req: any
   ): Promise<BrandEntity> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
 
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'INSERT',  // Acción que describe la creación
-      tabla_afectada: 'brands',
-      descripcion: 'Creación de una nueva marca',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);  // Guardar log en la base de datos
     return this.serviceService.createBrand(brandData);
   }
 
@@ -103,18 +79,7 @@ export class AdminController {
     @Body(new ValidationPipe) vehicleData: CreateVehicleDto,
     @Request() req: any
   ): Promise<VehicleTypeEntity> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
 
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'INSERT',  // Acción que describe la creación
-      tabla_afectada: 'vehicleTypes',
-      descripcion: 'Creación de un nuevo tipo de vehiculo',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);  // Guardar log en la base de datos
     return this.serviceService.createVehicleType(vehicleData);
   }
 
@@ -126,18 +91,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateData: UpdateServiceDto,
     @Request() req: any
   ): Promise<ServiceEntity> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'UPDATE',  // Acción que describe la creación
-      tabla_afectada: 'services',
-      descripcion: 'Modificacion de un servicio',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
+   
     return this.serviceService.updateService(id, updateData);
   }
 
@@ -149,18 +103,6 @@ export class AdminController {
     @Body(new ValidationPipe()) updateData: UpdateBrandDto,
     @Request() req: any
   ): Promise<BrandEntity> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'UPDATE',  // Acción que describe la creación
-      tabla_afectada: 'brands',
-      descripcion: 'Modificacion de una marca',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
-
     return this.serviceService.updateBrand(id, updateData);
   }
 
@@ -172,17 +114,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateData: UpdateVehicleDto,
     @Request() req: any
   ): Promise<VehicleTypeEntity> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'UPDATE',  // Acción que describe la creación
-      tabla_afectada: 'vehicleType',
-      descripcion: 'Modificacion de un tipo de vehiculo',
-      ip_usuario: userIp,
-    });
 
-    await this.logRepository.save(log);
 
     return this.serviceService.updateVehicleType(id, updateData);
   }
@@ -214,18 +146,6 @@ export class AdminController {
     @Param('id') id: number,
     @Request() req: any
   ): Promise<void> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'DELETE',  // Acción que describe la creación
-      tabla_afectada: 'service',
-      descripcion: 'Eliminacion de un servicio',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
 
     await this.serviceService.deleteService(id);
   }
@@ -237,17 +157,6 @@ export class AdminController {
     @Param('id') id: number,
     @Request() req: any
   ): Promise<void> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'DELETE',  // Acción que describe la creación
-      tabla_afectada: 'brands',
-      descripcion: 'Eliminacion de una marca',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
     await this.serviceService.deleteBrand(id);
   }
 
@@ -258,17 +167,6 @@ export class AdminController {
     @Param('id') id: number,
     @Request() req: any
   ): Promise<void> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'DELETE',  // Acción que describe la creación
-      tabla_afectada: 'vehicleType',
-      descripcion: 'Eliminacion de un tipo de vehiculo',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
     await this.serviceService.deleteVehicleType(id);
   }
 
@@ -281,18 +179,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateData: UpdateCorporateImageDto,
     @Request() req: any
   ): Promise<CorporateImage> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'UPDATE',  // Acción que describe la creación
-      tabla_afectada: 'mision, vision',
-      descripcion: 'Modificacion de la mision, vision de la empresa',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
+    
     return this.corporateimageService.update(id, updateData);
   }
 
@@ -313,18 +200,7 @@ export class AdminController {
     @Body(new ValidationPipe()) createContactDto: CreateContactDto,
     @Request() req: any
   ): Promise<Contact> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
 
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'INSERT',  // Acción que describe la creación
-      tabla_afectada: 'contact',
-      descripcion: 'Creando un nuevo dato de contacto de la empresa',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
     return this.contactService.create(createContactDto);
   }
 
@@ -336,18 +212,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateContactDto: UpdateContactDto,
     @Request() req: any
   ): Promise<Contact> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'UPDATE',  // Acción que describe la creación
-      tabla_afectada: 'contact',
-      descripcion: 'Modificando un dato de contacto de la empresa',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
+   
     return this.contactService.update(id, updateContactDto);
   }
 
@@ -368,17 +233,7 @@ export class AdminController {
     @Param('id') id: number,
     @Request() req: any
   ): Promise<void> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'DELETE',  // Acción que describe la creación
-      tabla_afectada: 'contact',
-      descripcion: 'Eliminacion de un dato de contacto de la empresa',
-      ip_usuario: userIp,
-    });
 
-    await this.logRepository.save(log);
     await this.contactService.remove(id);
   }
 
@@ -390,18 +245,7 @@ export class AdminController {
     @Body(new ValidationPipe()) createPoliceDto: CreatePoliceDto,
     @Request() req: any
   ): Promise<Police> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
-
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'INSERT',  // Acción que describe la creación
-      tabla_afectada: 'police',
-      descripcion: 'Creacion de nuevas politicas de la empresa',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
+    
     return this.policeService.create(createPoliceDto);
   }
 
@@ -413,18 +257,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updatePoliceDto: UpdatePoliceDto,
     @Request() req: any
   ): Promise<Police> {
-    const userEmail = req.user.email;
-    const userIp = req.ip;
     
-    const log = this.logRepository.create({
-      usuario: userEmail,
-      accion: 'UPDATE',  // Acción que describe la creación
-      tabla_afectada: 'police',
-      descripcion: 'Modificacion de las politicas de la empresa',
-      ip_usuario: userIp,
-    });
-
-    await this.logRepository.save(log);
     return this.policeService.update(id, updatePoliceDto);
   }
 

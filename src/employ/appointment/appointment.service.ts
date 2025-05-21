@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 
 import { AppointmentEntity } from './entities/appointment.entity';
-import { AppointmentServiceEntity } from './entities/appointment-services';
+import { AppointmentServiceEntity } from './entities/appointment-services-entity';
 import { AppointmentServicesViewEntity } from '../entities-view/appointment_services_view';
 import { AppointmentRejectionEntity } from './entities/appointment-rejection-entity';
 import { CancelledAppointmentsViewEntity } from '../entities-view/appointments_cancelled_view';

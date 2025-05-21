@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { ServiceEntity } from './entities/service.entity';
 import { BrandEntity } from './entities/brand.entity';
 import { VehicleTypeEntity } from './entities/vehicle.entity';
-import { LogEntity } from 'src/log/entity/log.entity';
 
 import { CreateServiceDto } from './dto/create-service.dto';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -28,19 +27,9 @@ export class ServiceService {
         @InjectRepository(VehicleTypeEntity)
         private readonly vehicleRepository: Repository<VehicleTypeEntity>,
 
-        @InjectRepository(LogEntity)
-        private readonly logRepository: Repository<LogEntity>,
+    
     ) { }
 
-    // Método privado para guardar logs
-    /*private async saveLog(level: string, message: string, extraInfo?: string) {
-        await this.logRepository.save({
-            level,
-            message,
-            extraInfo,
-            timestamp: new Date(),
-        });
-    }*/
 
 
     async createService(serviceData: CreateServiceDto): Promise<ServiceEntity> {

@@ -1,7 +1,7 @@
 import { IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
 import { AppointmentRejectionEntity } from "./appointment-rejection-entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { AppointmentServiceEntity } from "./appointment-services";
+import { AppointmentServiceEntity } from "./appointment-services-entity";
 import { AppointmentCancellationEntity } from "./appointment-cancellation-entity";
 import { ClientEntity } from "src/public/recover-password/entity/client-entity";
 import { AuthorizedPersonnelEntity } from "src/public/recover-password/entity/authorized-personnel-entity";

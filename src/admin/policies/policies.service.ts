@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Police } from './entities/policies.entity';
 import { PoliceEstado,CreatePoliceDto } from './dto/create-policies.dto';
 import { UpdatePoliceDto } from './dto/update-policies.dto';
-import { LogEntity } from 'src/log/entity/log.entity';
 
 @Injectable()
 export class PoliceService {
@@ -12,19 +11,9 @@ export class PoliceService {
     @InjectRepository(Police)
     private policeRepository: Repository<Police>,
 
-    @InjectRepository(LogEntity)
-    private readonly logRepository: Repository<LogEntity>,
+   
   ) {}
 
-  // Método para guardar logs
-  /*private async saveLog(level: string, message: string, extraInfo?: string) {
-    await this.logRepository.save({
-      level,
-      message,
-      extraInfo,
-      timestamp: new Date(),
-    });
-  }*/
 
   // Método para crear un nuevo registro de police
 async create(createPoliceDto: CreatePoliceDto): Promise<Police> {

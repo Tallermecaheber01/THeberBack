@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import { UserViewEntity } from './view/vw-users-entity';
 import { ClientEntity } from '../recover-password/entity/client-entity';
 import { AuthorizedPersonnelEntity } from '../recover-password/entity/authorized-personnel-entity';
-import { LogEntity } from 'src/log/entity/log.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
@@ -26,22 +25,11 @@ export class LoginService {
         @InjectRepository(AuthorizedPersonnelEntity)
         private personnelRepository: Repository<AuthorizedPersonnelEntity>,
 
-        @InjectRepository(LogEntity)
-        private logRepository: Repository<LogEntity>,
-
+       
         private readonly logger: LoggerService
     ) { }
 
-    // Función para registrar logs
-    /* async saveLog(level: string, message: string, user: string, extraInfo?: string) {
-         await this.logRepository.save({
-             level,
-             message,
-             user,
-             extraInfo,
-             timestamp: new Date(),
-         });
-     }*/
+   
 
     // Método para manejar el login
     async login(loginDto: LoginDto, @Res() res: Response) {

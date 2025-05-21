@@ -1,5 +1,5 @@
 import { AppointmentRejectionEntity } from './../employ/appointment/entities/appointment-rejection-entity';
-import { AppointmentServiceEntity } from './../employ/appointment/entities/appointment-services';
+import { AppointmentServiceEntity } from '../employ/appointment/entities/appointment-services-entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module, OnModuleInit } from '@nestjs/common';
 import { PublicController } from './public.controller';
@@ -12,7 +12,6 @@ import { AppointmentEntity } from 'src/employ/appointment/entities/appointment.e
 import { AuthorizedPersonnelEntity } from './recover-password/entity/authorized-personnel-entity';
 import { UserViewEntity } from './register/view/vw-users-entity';
 import { JwtModule } from '@nestjs/jwt';
-import { LogEntity } from 'src/log/entity/log.entity';
 import { InformationService } from './information/information.service';
 import { QuestionSecretEntity } from './register/entity/question-secret.entity';
 import { UnlockService } from './unlock/unlock.service';
@@ -36,14 +35,14 @@ import { LoggerService } from 'src/services/logger/logger.service';
         username: configService.get<string>('DB_USERNAME_PUBLIC'),
         password: configService.get<string>('DB_PASSWORD_PUBLIC'),
         database: configService.get<string>('DB_NAME'),
-        entities: [ClientEntity, UserViewEntity, LogEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentEntity,
+        entities: [ClientEntity, UserViewEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentEntity,
           AppointmentServiceEntity, AppointmentCancellationEntity, AppointmentRejectionEntity, VehicleEntity, Contact, ServiceEntity
         ],
         synchronize: false,
       }),
       inject: [ConfigService]
     }),
-    TypeOrmModule.forFeature([ClientEntity, UserViewEntity, LogEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentEntity,
+    TypeOrmModule.forFeature([ClientEntity, UserViewEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentEntity,
       AppointmentServiceEntity, AppointmentCancellationEntity, AppointmentRejectionEntity, VehicleEntity, Contact, ServiceEntity
     ]),
     JwtModule.register({

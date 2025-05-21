@@ -1,15 +1,18 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { EmployController } from './employ.controller';
 
-//Servicios
+//Services
 import { AppointmentService } from './appointment/appointment.service';
 import { RepairService } from './repair/repair.service';
 import { LoggerService } from 'src/services/logger/logger.service';
 
-//Entidades que son las tablas en la base de datos
+//Entities
 import { AppointmentEntity } from './appointment/entities/appointment.entity';
-import { AppointmentServiceEntity } from './appointment/entities/appointment-services';
+import { AppointmentServiceEntity } from './appointment/entities/appointment-services-entity';
 import { AppointmentServicesViewEntity } from './entities-view/appointment_services_view';
 import { UserVehicleViewEntity } from './entities-view/user-vehicle.view.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
@@ -20,13 +23,9 @@ import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/au
 import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
 import { AppointmentWaitingViewEntity } from './entities-view/appointment_waiting_view';
 import { AppointmentRejectionEntity } from './appointment/entities/appointment-rejection-entity';
-import { ScheduleModule } from '@nestjs/schedule';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
 import { QuestionSecretEntity } from 'src/public/register/entity/question-secret.entity';
 import { Contact } from 'src/admin/contact/entities/contacts.entity';
-import { JwtModule } from '@nestjs/jwt';
-import { LogEntity } from 'src/log/entity/log.entity';
 
 @Module({
   imports: [
@@ -44,7 +43,7 @@ import { LogEntity } from 'src/log/entity/log.entity';
         entities: [AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
           AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact,LogEntity
+          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact
         ],
         synchronize: false,
       }),
@@ -54,7 +53,7 @@ import { LogEntity } from 'src/log/entity/log.entity';
       AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
       AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
       CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact,LogEntity
+      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,

@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { Contact } from './entities/contacts.entity';
 import { CreateContactDto } from './dto/create-contacts.dto';
 import { UpdateContactDto } from './dto/update-contacts.dto';
-import { LogEntity } from 'src/log/entity/log.entity';
 
 @Injectable()
 export class ContactService {
@@ -12,19 +11,8 @@ export class ContactService {
     @InjectRepository(Contact)
     private contactRepository: Repository<Contact>,
 
-    @InjectRepository(LogEntity)
-    private readonly logRepository: Repository<LogEntity>,
   ) { }
 
-  // Método para guardar logs
-  /*private async saveLog(level: string, message: string, extraInfo?: string) {
-    await this.logRepository.save({
-      level,
-      message,
-      extraInfo,
-      timestamp: new Date(),
-    });
-  }*/
 
   // Método para crear un nuevo contacto
   async create(createContactDto: CreateContactDto): Promise<Contact> {

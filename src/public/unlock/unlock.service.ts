@@ -4,7 +4,6 @@ import { Repository, LessThanOrEqual } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClientEntity } from '../recover-password/entity/client-entity';
 import { AuthorizedPersonnelEntity } from '../recover-password/entity/authorized-personnel-entity';
-import { LogEntity } from 'src/log/entity/log.entity';
 import { LoggerService } from 'src/services/logger/logger.service';
 
 @Injectable()
@@ -16,27 +15,12 @@ export class UnlockService implements OnModuleInit {
         @InjectRepository(AuthorizedPersonnelEntity)
         private personnelRepository: Repository<AuthorizedPersonnelEntity>,
 
-        @InjectRepository(LogEntity)
-        private logRepository: Repository<LogEntity>,
-
         private readonly logger:LoggerService,
     ) { }
 
     onModuleInit() {
         console.log("✅ UnlockService iniciado - Cron Job activado");
     }
-
-    
-
-    /*async saveLog(level: string, message: string, user: string, extraInfo?: string) {
-        await this.logRepository.save({
-            level,
-            message,
-            user,
-            extraInfo,
-            timestamp: new Date(),
-        });
-    }*/
 
     // 🔥 CRON JOB: Se ejecuta automáticamente cada minuto
     @Cron('*/1 * * * *') // Corre cada 1 minuto

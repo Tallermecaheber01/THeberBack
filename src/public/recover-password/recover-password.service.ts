@@ -8,7 +8,6 @@ import * as nodemailer from 'nodemailer';
 import { randomInt } from 'crypto';
 import * as moment from 'moment'
 import * as bcrypt from 'bcrypt'
-import { LogEntity } from 'src/log/entity/log.entity';
 import { LoggerService } from 'src/services/logger/logger.service';
 
 @Injectable()
@@ -25,22 +24,11 @@ export class RecoverPasswordService {
         @InjectRepository(UserViewEntity)
         private readonly userRepository: Repository<UserViewEntity>,
 
-        @InjectRepository(LogEntity)
-        private readonly logRepository: Repository<LogEntity>,
 
         private readonly logger: LoggerService,
     ) { }
 
-    //Funcion para registrar logs
-    /*async saveLog(level: string, message: string, user: string, extraInfo?: string) {
-        await this.logRepository.save({
-            level,
-            message,
-            user,
-            extraInfo,
-            timestamp: new Date(),
-        });
-    }*/
+
 
     // Configura el transporte de nodemailer
     private transporter = nodemailer.createTransport({

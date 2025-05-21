@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CorporateImage } from '../corporateimage/entities/corporateimage.entity';
 import { UpdateCorporateImageDto } from '../corporateimage/dto/update-corporateimage.dto';
-import { LogEntity } from 'src/log/entity/log.entity';
 
 @Injectable()
 export class CorporateimageService {
@@ -11,18 +10,8 @@ export class CorporateimageService {
     @InjectRepository(CorporateImage)
     private corporateImageRepository: Repository<CorporateImage>,
 
-    @InjectRepository(LogEntity)
-    private readonly logRepository: Repository<LogEntity>,
   ) { }
 
-  /*private async saveLog(level: string, message: string, extraInfo?: string) {
-    await this.logRepository.save({
-      level,
-      message,
-      extraInfo,
-      timestamp: new Date(),
-    });
-  }*/
 
   // Método para actualizar el título y la descripción de una CorporateImage
   async update(id: number, updateDto: UpdateCorporateImageDto): Promise<CorporateImage> {

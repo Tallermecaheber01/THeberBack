@@ -16,7 +16,6 @@ import { Roles } from 'src/role/role.decorator';
 import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { RoleGuard } from 'src/role/guards/role/role.guard';
 import { LoggerService } from 'src/services/logger/logger.service';
-import { LogEntity } from 'src/log/entity/log.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -29,8 +28,6 @@ export class EmployController {
         private readonly repairService: RepairService, //se crea el objeto del servicio
         private readonly logger: LoggerService,
 
-        @InjectRepository(LogEntity)
-        private readonly logRepository: Repository<LogEntity>,
     ) { }
 
 
@@ -42,21 +39,9 @@ export class EmployController {
         @Request() req: any
     ): Promise<any> {
         const { appointment, services } = data;
-        const userEmail = req.user.email;
-        const userIp = req.ip;
-
+        
         // Llamamos al servicio para crear la cita y los servicios
         const result = await this.appointmentService.createNewAppointmentWithServices(appointment, services);
-        // Registrar Log en la base de datos
-        const log = this.logRepository.create({
-            usuario: userEmail,
-            accion: 'INSERT',  // Acción que describe la creación
-            tabla_afectada: 'appointments',
-            descripcion: `Creación de una nueva cita con ID ${result.id}`,
-            ip_usuario: userIp,
-        });
-
-        await this.logRepository.save(log);  // Guardar log en la base de datos
 
         // Devolvemos la cita y los servicios guardados
         return result;
@@ -125,8 +110,7 @@ export class EmployController {
         @Request() req: any
     ): Promise<AppointmentEntity> {
 
-        const userEmail = req.user.email;
-        const userIp = req.ip;
+      
         // Se asume que el servicio gestionará si no se encuentra la cita o si el estado no es "en espera"
         const updatedAppointment = await this.appointmentService.updateAppointmentStatusAndDetails(
             id,
@@ -138,16 +122,7 @@ export class EmployController {
             throw new NotFoundException(`Cita con id ${id} no encontrada o no está en estado "en espera"`);
         }
 
-        // Registrar Log en la base de datos
-        const log = this.logRepository.create({
-            usuario: userEmail,
-            accion: 'UPDATE',
-            tabla_afectada: 'appointments',
-            descripcion: `Actualización de cita con ID ${id}. Nuevo estado: ${updateAppointmentDto.estado}`,
-            ip_usuario: userIp,
-        });
-
-        await this.logRepository.save(log);  // Guardar log en la base de datos
+        
 
         return updatedAppointment;
     }
@@ -196,9 +171,6 @@ export class EmployController {
         @Request() req: any
     ): Promise<RepairEntity> {
 
-        const userEmail = req.user.email;
-        const userIp = req.ip;
-        // 1. Crear la reparación
         const repair = await this.repairService.createNewRepair(repairData);
         const updateData: UpdateAppointmentDto = { estado: AppointmentStatus.COMPLETED };
 
@@ -207,16 +179,7 @@ export class EmployController {
             updateData
         );
 
-        // Registrar Log en la base de datos
-        const log = this.logRepository.create({
-            usuario: userEmail,
-            accion: 'INSERT',
-            tabla_afectada: 'repairs',
-            descripcion: `Creación de una nueva reparación para la cita con ID ${repairData.idCita}`,
-            ip_usuario: userIp,
-        });
-
-        await this.logRepository.save(log);  // Guardar log en la base de datos
+       
 
 
         return repair;
@@ -242,19 +205,9 @@ export class EmployController {
         @Body(new ValidationPipe()) updateRepairDto: UpdateRepairDto,
         @Request() req: any
     ): Promise<RepairEntity> {
-        const userEmail = req.user.email;
-        const userIp = req.ip;
+  
 
-        // Registrar Log en la base de datos
-        const log = this.logRepository.create({
-            usuario: userEmail,
-            accion: 'UPDATE',
-            tabla_afectada: 'repairs',
-            descripcion: `Modificacion de una reparacion`,
-            ip_usuario: userIp,
-        });
-
-        await this.logRepository.save(log);  // Guardar log en la base de datos
+        
         return this.repairService.updateRepair(id, updateRepairDto);
     }
 

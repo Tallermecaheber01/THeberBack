@@ -11,12 +11,11 @@ import { EmployModule } from './employ/employ.module';
 import { PublicModule } from './public/public.module';
 
 // Entities
-import { LogEntity } from './log/entity/log.entity';
 import { ServiceEntity } from './admin/service/entities/service.entity';
 import { BrandEntity } from './admin/service/entities/brand.entity';
 import { VehicleTypeEntity } from './admin/service/entities/vehicle.entity';
 import { AppointmentEntity } from './employ/appointment/entities/appointment.entity';
-import { AppointmentServiceEntity } from './employ/appointment/entities/appointment-services';
+import { AppointmentServiceEntity } from './employ/appointment/entities/appointment-services-entity';
 import { AppointmentServicesViewEntity } from './employ/entities-view/appointment_services_view';
 import { UserVehicleViewEntity } from './employ/entities-view/user-vehicle.view.entity';
 import { VehicleEntity } from './client/vehicles/entities/vehicle.entity';
