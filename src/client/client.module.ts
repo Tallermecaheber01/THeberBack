@@ -21,6 +21,11 @@ import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { UserViewEntity } from 'src/public/register/view/vw-users-entity';
 import { VehicleTypeEntity } from 'src/admin/service/entities/vehicle.entity';
 import { BrandEntity } from 'src/admin/service/entities/brand.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { LoggerService } from 'src/services/logger/logger.service';
+import { AppointmentClientService } from './appointment-client/appointment-client.service';
+//Views
+import { VwAppointmentDetails } from './appointment-client/view/vw-appointment-details.entity';
 
 @Module({
   imports: [
@@ -35,10 +40,9 @@ import { BrandEntity } from 'src/admin/service/entities/brand.entity';
         username: configService.get<string>('DB_USERNAME_CLIENT'),
         password: configService.get<string>('DB_PASSWORD_CLIENT'),
         database: configService.get<string>('DB_NAME'),
-        entities: [
-          VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
+        entities: [VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
           AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity,
-          VehicleTypeEntity, BrandEntity,ServiceEntity
+          VehicleTypeEntity, BrandEntity,ServiceEntity, VwAppointmentDetails
         ],
         synchronize: false,
       }),
@@ -46,10 +50,14 @@ import { BrandEntity } from 'src/admin/service/entities/brand.entity';
     }),
     TypeOrmModule.forFeature([VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
       AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity, VehicleTypeEntity,
-      BrandEntity
-    ])],
+      BrandEntity,VwAppointmentDetails
+    ]),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+    })
+  ],
   controllers: [ClientController],
-  providers: [ VehiclesService],
+  providers: [ VehiclesService,LoggerService, AppointmentClientService],
   exports: []
 })
 export class ClientModule implements OnModuleInit {

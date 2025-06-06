@@ -34,6 +34,7 @@ import { UserVehicleViewEntity } from 'src/employ/entities-view/user-vehicle.vie
 import { RepairEntity } from 'src/employ/repair/entities/repair.entity';
 import { CancelledAppointmentsViewEntity } from 'src/employ/entities-view/appointments_cancelled_view';
 import { Police } from './policies/entities/policies.entity';
+import { VwAppointmentDetails } from 'src/client/appointment-client/view/vw-appointment-details.entity';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { Police } from './policies/entities/policies.entity';
           AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
           AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
           QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
-          CancelledAppointmentsViewEntity, Police
+          CancelledAppointmentsViewEntity, Police,VwAppointmentDetails
         ],
         synchronize: false,
       }),
@@ -62,7 +63,7 @@ import { Police } from './policies/entities/policies.entity';
       AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
       AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
       QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
-      CancelledAppointmentsViewEntity, Police
+      CancelledAppointmentsViewEntity, Police,VwAppointmentDetails
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,

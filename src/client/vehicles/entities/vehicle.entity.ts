@@ -1,13 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ClientEntity } from "src/public/recover-password/entity/client-entity";
 
 @Entity('vehicle')
 export class VehicleEntity {
     @PrimaryGeneratedColumn()
     id: number;
-
-    @Column({ unique: true }) // El número de serie suele ser único
-    numeroSerie: string;
 
     @Column()
     marca: string;
@@ -21,6 +18,13 @@ export class VehicleEntity {
     @Column({ unique: true }) // La placa también suele ser única
     placa: string;
 
-    @ManyToOne(() => ClientEntity, client => client.vehiculos, {onDelete:'CASCADE'})
-    idPropietario:ClientEntity;
+    @Column({ type: 'varchar', length: 17, unique: true }) // El VIN es un identificador único
+    VIN: string;
+
+    @Column({ unique: true }) // El número de serie suele ser único
+    numeroSerie: string;
+
+    @ManyToOne(() => ClientEntity, client => client.vehiculos, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'idPropietario' })
+    idPropietario: ClientEntity;
 }
