@@ -2,7 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config'; // Importar ConfigModule y ConfigService
+import { ConfigModule, ConfigService } from '@nestjs/config'; 
 
 // Módulos
 import { ClientModule } from './client/client.module';
