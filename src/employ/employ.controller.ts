@@ -16,8 +16,7 @@ import { Roles } from 'src/role/role.decorator';
 import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { RoleGuard } from 'src/role/guards/role/role.guard';
 import { LoggerService } from 'src/services/logger/logger.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
 
 
 
@@ -39,7 +38,7 @@ export class EmployController {
         @Request() req: any
     ): Promise<any> {
         const { appointment, services } = data;
-        
+
         // Llamamos al servicio para crear la cita y los servicios
         const result = await this.appointmentService.createNewAppointmentWithServices(appointment, services);
 
@@ -100,6 +99,13 @@ export class EmployController {
         return appointmentsInWaiting;
     }
 
+    //Endpoint para obtener citas de Pendiente Cambio
+    @Get('appointments/pending-change')
+    async getAppointmentsPendingChange() {
+        const appointmentsPendingChange = await this.appointmentService.getAppointmentsPendingChange();
+        return appointmentsPendingChange;
+    }
+
     // Actualizar cita (total, nombreEmpleado, estado) solo para citas con estado "en espera"
     @Patch('appointment/update/:id')
     @Roles('administrador', 'empleado')
@@ -110,7 +116,7 @@ export class EmployController {
         @Request() req: any
     ): Promise<AppointmentEntity> {
 
-      
+
         // Se asume que el servicio gestionará si no se encuentra la cita o si el estado no es "en espera"
         const updatedAppointment = await this.appointmentService.updateAppointmentStatusAndDetails(
             id,
@@ -122,7 +128,7 @@ export class EmployController {
             throw new NotFoundException(`Cita con id ${id} no encontrada o no está en estado "en espera"`);
         }
 
-        
+
 
         return updatedAppointment;
     }
@@ -179,7 +185,7 @@ export class EmployController {
             updateData
         );
 
-       
+
 
 
         return repair;
@@ -205,9 +211,9 @@ export class EmployController {
         @Body(new ValidationPipe()) updateRepairDto: UpdateRepairDto,
         @Request() req: any
     ): Promise<RepairEntity> {
-  
 
-        
+
+
         return this.repairService.updateRepair(id, updateRepairDto);
     }
 

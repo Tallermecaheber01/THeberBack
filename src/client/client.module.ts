@@ -24,8 +24,15 @@ import { BrandEntity } from 'src/admin/service/entities/brand.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { LoggerService } from 'src/services/logger/logger.service';
 import { AppointmentClientService } from './appointment-client/appointment-client.service';
+import { RepairPaymentEntity } from './repair-payment/entity/repair.entity';
+import { AppointmentClient } from './appointment-client/entity/appointment-client.entity';
+import { AppointmentServiceClient } from './appointment-client/entity/appointment-client-service.entity';
+import { AppointmentCancellation } from './appointment-client/entity/appointment-cancellation.entity';
 //Views
 import { VwAppointmentDetails } from './appointment-client/view/vw-appointment-details.entity';
+import { RepairPaymentService } from './repair-payment/repair-payment.service';
+import { HistoryRepairsService } from './history-repairs/history-repairs.service';
+import { VistaRepairsEmpleados } from './history-repairs/view/vista_repairs_empleados';
 
 @Module({
   imports: [
@@ -42,22 +49,22 @@ import { VwAppointmentDetails } from './appointment-client/view/vw-appointment-d
         database: configService.get<string>('DB_NAME'),
         entities: [VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
           AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity,
-          VehicleTypeEntity, BrandEntity,ServiceEntity, VwAppointmentDetails
+          VehicleTypeEntity, BrandEntity,ServiceEntity, VwAppointmentDetails,RepairPaymentEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation
         ],
         synchronize: false,
       }),
       inject: [ConfigService]
     }),
     TypeOrmModule.forFeature([VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
-      AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity, VehicleTypeEntity,
-      BrandEntity,VwAppointmentDetails
+      AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity, VehicleTypeEntity,RepairPaymentEntity,
+      BrandEntity,VwAppointmentDetails,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
     })
   ],
   controllers: [ClientController],
-  providers: [ VehiclesService,LoggerService, AppointmentClientService],
+  providers: [ VehiclesService,LoggerService, AppointmentClientService, RepairPaymentService, HistoryRepairsService],
   exports: []
 })
 export class ClientModule implements OnModuleInit {

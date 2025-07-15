@@ -22,19 +22,31 @@ import { Contact } from './contact/entities/contacts.entity';
 import { AppointmentEntity } from 'src/employ/appointment/entities/appointment.entity';
 import { AppointmentCancellationEntity } from 'src/employ/appointment/entities/appointment-cancellation-entity';
 import { AppointmentRejectionEntity } from 'src/employ/appointment/entities/appointment-rejection-entity';
-import { AppointmentWaitingViewEntity } from 'src/employ/entities-view/appointment_waiting_view';
 import { AppointmentServiceEntity } from 'src/employ/appointment/entities/appointment-services-entity';
-import { AppointmentServicesViewEntity } from 'src/employ/entities-view/appointment_services_view';
 import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';
 import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
 import { QuestionSecretEntity } from 'src/public/register/entity/question-secret.entity';
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
+import { RepairEntity } from 'src/employ/repair/entities/repair.entity';
+import { Police } from './policies/entities/policies.entity';
+import { RepairPaymentEntity } from 'src/client/repair-payment/entity/repair.entity';
+import { Pago } from 'src/mercado-pago/entity/pago.entity';
+import { StateRepairEntity } from 'src/mercado-pago/pago/pagado.entity';
+import { AcceptCashService } from './accept-cash/accept-cash.service';
+import { RepairClientViewEntity } from './accept-cash/view/repair-client-view.entity';
+import { AppointmentClient } from 'src/client/appointment-client/entity/appointment-client.entity';
+import { AppointmentServiceClient } from 'src/client/appointment-client/entity/appointment-client-service.entity';
+import { AppointmentCancellation } from 'src/client/appointment-client/entity/appointment-cancellation.entity';
+
+//Views
+import { AppointmentWaitingViewEntity } from 'src/employ/entities-view/appointment_waiting_view';
+import { AppointmentServicesViewEntity } from 'src/employ/entities-view/appointment_services_view';
 import { UserViewEntity } from 'src/public/register/view/vw-users-entity';
 import { UserVehicleViewEntity } from 'src/employ/entities-view/user-vehicle.view.entity';
-import { RepairEntity } from 'src/employ/repair/entities/repair.entity';
 import { CancelledAppointmentsViewEntity } from 'src/employ/entities-view/appointments_cancelled_view';
-import { Police } from './policies/entities/policies.entity';
 import { VwAppointmentDetails } from 'src/client/appointment-client/view/vw-appointment-details.entity';
+import {AppointmentPendingChangeViewEntity} from 'src/employ/entities-view/appointment_change_view';
+import { VistaRepairsEmpleados } from 'src/client/history-repairs/view/vista_repairs_empleados';
 
 @Module({
   imports: [
@@ -53,7 +65,9 @@ import { VwAppointmentDetails } from 'src/client/appointment-client/view/vw-appo
           AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
           AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
           QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
-          CancelledAppointmentsViewEntity, Police,VwAppointmentDetails
+          CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
+          RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
+          AppointmentPendingChangeViewEntity
         ],
         synchronize: false,
       }),
@@ -63,7 +77,9 @@ import { VwAppointmentDetails } from 'src/client/appointment-client/view/vw-appo
       AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
       AppointmentService, AppointmentServiceEntity, AppointmentServicesViewEntity, AuthorizedPersonnelEntity,
       QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
-      CancelledAppointmentsViewEntity, Police,VwAppointmentDetails
+      CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
+      RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
+      AppointmentPendingChangeViewEntity
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -71,7 +87,7 @@ import { VwAppointmentDetails } from 'src/client/appointment-client/view/vw-appo
     })
   ],
   controllers: [AdminController],
-  providers: [ServiceService, ContactService, CorporateimageService, PoliceService,LoggerService],
+  providers: [ServiceService, ContactService, CorporateimageService, PoliceService,LoggerService, AcceptCashService],
   exports: [ServiceService, CorporateimageService], // Exporta si se necesita en otros módulos
 })
 export class AdminModule implements OnModuleInit {

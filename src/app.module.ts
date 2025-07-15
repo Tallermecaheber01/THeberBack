@@ -30,6 +30,7 @@ import { AppointmentRejectionEntity } from './employ/appointment/entities/appoin
 import { QuestionSecretEntity } from './public/register/entity/question-secret.entity';
 import { CorporateImage } from './admin/corporateimage/entities/corporateimage.entity';
 import { Contact } from './admin/contact/entities/contacts.entity';
+import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { Contact } from './admin/contact/entities/contacts.entity';
     ClientModule,
     EmployModule,
     PublicModule,
+    MercadoPagoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

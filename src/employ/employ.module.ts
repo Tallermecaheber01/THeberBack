@@ -9,23 +9,27 @@ import { EmployController } from './employ.controller';
 import { AppointmentService } from './appointment/appointment.service';
 import { RepairService } from './repair/repair.service';
 import { LoggerService } from 'src/services/logger/logger.service';
+import { EmailService } from './appointment/email.service';
 
 //Entities
 import { AppointmentEntity } from './appointment/entities/appointment.entity';
 import { AppointmentServiceEntity } from './appointment/entities/appointment-services-entity';
-import { AppointmentServicesViewEntity } from './entities-view/appointment_services_view';
-import { UserVehicleViewEntity } from './entities-view/user-vehicle.view.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { RepairEntity } from './repair/entities/repair.entity';
 import { AppointmentCancellationEntity } from './appointment/entities/appointment-cancellation-entity';
-import { CancelledAppointmentsViewEntity } from './entities-view/appointments_cancelled_view';
 import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';
 import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
-import { AppointmentWaitingViewEntity } from './entities-view/appointment_waiting_view';
 import { AppointmentRejectionEntity } from './appointment/entities/appointment-rejection-entity';
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
 import { QuestionSecretEntity } from 'src/public/register/entity/question-secret.entity';
 import { Contact } from 'src/admin/contact/entities/contacts.entity';
+
+//Views
+import { AppointmentServicesViewEntity } from './entities-view/appointment_services_view';
+import { UserVehicleViewEntity } from './entities-view/user-vehicle.view.entity';
+import { CancelledAppointmentsViewEntity } from './entities-view/appointments_cancelled_view';
+import { AppointmentWaitingViewEntity } from './entities-view/appointment_waiting_view';
+import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_change_view';
 
 @Module({
   imports: [
@@ -43,7 +47,7 @@ import { Contact } from 'src/admin/contact/entities/contacts.entity';
         entities: [AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
           AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact
+          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity
         ],
         synchronize: false,
       }),
@@ -53,7 +57,7 @@ import { Contact } from 'src/admin/contact/entities/contacts.entity';
       AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
       AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
       CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact
+      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -61,7 +65,7 @@ import { Contact } from 'src/admin/contact/entities/contacts.entity';
     })
   ],
   controllers: [EmployController],
-  providers: [AppointmentService, RepairService, LoggerService],
+  providers: [AppointmentService, RepairService, LoggerService,EmailService],
   exports: [AppointmentService]
 })
 export class EmployModule implements OnModuleInit {

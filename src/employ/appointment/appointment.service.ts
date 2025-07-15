@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
+import { EmailService } from './email.service';
 
 import { AppointmentEntity } from './entities/appointment.entity';
 import { AppointmentServiceEntity } from './entities/appointment-services-entity';
@@ -18,10 +19,13 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { CreateAppointmentRejectionDto } from './dto/create-appointment-rejection.dto';
 import { AppointmentWaitingViewEntity } from './../entities-view/appointment_waiting_view';
+import { AppointmentPendingChangeViewEntity } from '../entities-view/appointment_change_view';
 
 @Injectable()
 export class AppointmentService {
     constructor(
+        private readonly emailService: EmailService,
+
         @InjectRepository(AppointmentEntity)
         private readonly appointmentRepository: Repository<AppointmentEntity>,
 
@@ -33,6 +37,9 @@ export class AppointmentService {
 
         @InjectRepository(AppointmentWaitingViewEntity)
         private readonly appointmentWaitingRepository: Repository<AppointmentWaitingViewEntity>,
+
+        @InjectRepository(AppointmentPendingChangeViewEntity)
+        private readonly appointmentPendingChangeRepository: Repository<AppointmentPendingChangeViewEntity>,
 
         @InjectRepository(AppointmentRejectionEntity)
         private readonly appointmentRejectionRepository: Repository<AppointmentRejectionEntity>,
@@ -105,6 +112,20 @@ export class AppointmentService {
         // Guardar los servicios asociados
         const savedServices = await this.appointmentServiceReporitory.save(servicesToCreate);
         console.log(savedAppointment);
+
+        await this.emailService.sendAppointmentAsignationEmail(
+            cliente.correo, // asegúrate que el cliente tenga el campo 'correo'
+            `${cliente.nombre} ${cliente.apellido_paterno} ${cliente.apellido_materno}`,
+            {
+                fecha: savedAppointment.fecha,
+                hora: savedAppointment.hora,
+                marca: savedAppointment.marca,
+                modelo: savedAppointment.modelo,
+                servicios: savedServices.map(s => s.servicio), // ajusta si el campo cambia
+                total: savedAppointment.total,
+            }
+        );
+
 
         return {
             appointment: savedAppointment,
@@ -368,6 +389,41 @@ export class AppointmentService {
         return Array.from(groupedAppointments.values());
     }
 
+    async getAppointmentsPendingChange(): Promise<any[]> {
+        // Buscar todas las citas "Pendiente de cambio" desde la vista
+        const appointments = await this.appointmentPendingChangeRepository.find();
+
+        if (!appointments || appointments.length === 0) {
+            console.warn('⚠️ No se encontraron citas con estado "Pendiente de cambio".');
+            return [];
+        }
+
+        const groupedAppointments = new Map<number, any>();
+
+        for (const appointment of appointments) {
+            if (!groupedAppointments.has(appointment.appointment_id)) {
+                groupedAppointments.set(appointment.appointment_id, {
+                    appointment_id: appointment.appointment_id,
+                    nombreCliente: appointment.nombreCliente,
+                    fecha: appointment.fecha,
+                    hora: appointment.hora,
+                    total: appointment.total,
+                    costoExtra: appointment.costoExtra,
+                    marca: appointment.marca,
+                    modelo: appointment.modelo,
+                    estado: appointment.estado,
+                    services: [],
+                });
+            }
+
+            groupedAppointments.get(appointment.appointment_id).services.push({
+                servicio: appointment.servicio,
+                costo: appointment.costo,
+            });
+        }
+
+        return Array.from(groupedAppointments.values());
+    }
 
     async updateAppointmentStatusAndDetails(
         appointmentId: number,
@@ -375,19 +431,22 @@ export class AppointmentService {
     ): Promise<AppointmentEntity> {
         console.log('📩 Datos recibidos para actualizar:', updateData);
 
-        // Buscar la cita con estado "en espera"
         const appointment = await this.appointmentRepository.findOne({
-            where: { id: appointmentId, estado: 'en espera' },
-            relations: ['empleado'] // Asegura que la relación con el empleado se cargue
+            where: {
+                id: appointmentId,
+                estado: In(['Pendiente de cambio', 'en espera']),
+            },
+            relations: ['empleado', 'cliente'], // asegúrate de incluir cliente para el mail
         });
 
         if (!appointment) {
-            throw new Error(`❌ No se encontró la cita con estado "en espera" y ID ${appointmentId}.`);
+            throw new Error(
+                `❌ No se encontró la cita con estado "Pendiente de cambio" o "en espera" y ID ${appointmentId}.`
+            );
         }
 
         console.log('🔍 Cita encontrada:', appointment);
 
-        // Si se proporciona un nuevo IdPersonal, buscar el empleado en la BD
         if (updateData.IdPersonal !== undefined) {
             const empleado = await this.employRepository.findOne({
                 where: { id: updateData.IdPersonal },
@@ -398,22 +457,43 @@ export class AppointmentService {
             }
 
             console.log('👨‍🔧 Empleado encontrado:', empleado);
-            appointment.empleado = empleado;  // Asignar la relación con el empleado
+            appointment.empleado = empleado;
         }
 
-        // Actualizar otros valores
         appointment.total = updateData.total ?? appointment.total;
-        appointment.estado = updateData.estado ?? appointment.estado;
+
+        // Lógica para cambio de estado según estado actual
+        if (appointment.estado === 'Pendiente de cambio') {
+            appointment.estado = 'Reprogramada';
+        } else if (appointment.estado === 'en espera') {
+            appointment.estado = 'Confirmada';
+        }
+
+        // Si updateData trae estado, sobrescribir (opcional)
+        if (updateData.estado) {
+            appointment.estado = updateData.estado;
+        }
 
         console.log('📌 Entidad antes de guardar:', appointment);
 
-        // Guardar cambios en la BD
         const savedAppointment = await this.appointmentRepository.save(appointment);
 
         console.log('✅ Cita actualizada y guardada:', savedAppointment);
 
+        const clienteEmail = appointment.cliente.correo;
+        const clienteNombre = appointment.cliente.nombre;
+
+        await this.emailService.sendAppointmentConfirmationEmail(clienteEmail, clienteNombre, {
+            fecha: savedAppointment.fecha,
+            hora: savedAppointment.hora,
+            empleadoNombre: savedAppointment.empleado.nombre,
+            total: savedAppointment.total,
+            estado: savedAppointment.estado,
+        });
+
         return savedAppointment;
     }
+
 
     async updateAppointmentIfConfirmed(
         appointmentId: number,
@@ -520,26 +600,46 @@ export class AppointmentService {
 
     //Servicio para rechazar una cita
     async rejectAppointment(data: CreateAppointmentRejectionDto): Promise<AppointmentRejectionEntity> {
-        const appointment = await this.appointmentRepository.findOne({ where: { id: data.idCita } });
+        const appointment = await this.appointmentRepository.findOne({
+            where: { id: data.idCita },
+            relations: ['cliente'], // Asegúrate de cargar la relación cliente
+        });
+
         if (!appointment) {
-            throw new Error(`❌ No se encontró la cita con ID ${data.idCita}`);
+            throw new Error(`No se encontró la cita con ID ${data.idCita}`);
         }
 
         const empleado = await this.employRepository.findOne({ where: { id: data.idPersonal } });
         if (!empleado) {
-            throw new Error(`❌ No se encontró el empleado con ID ${data.idPersonal}`);
+            throw new Error(`No se encontró el empleado con ID ${data.idPersonal}`);
         }
 
-        // Cambiar el estado de la cita a "Rechazada"
+        // Cambiar estado y guardar
         appointment.estado = 'Rechazada';
         await this.appointmentRepository.save(appointment);
 
         const rejection = this.appointmentRejectionRepository.create({
             appointment,
             motivo: data.motivo,
-            empleado
+            empleado,
         });
 
-        return await this.appointmentRejectionRepository.save(rejection);
+        const savedRejection = await this.appointmentRejectionRepository.save(rejection);
+
+        // Enviar correo si el cliente tiene email
+        if (appointment.cliente && appointment.cliente.correo) {
+            await this.emailService.sendRejectionEmail(
+                appointment.cliente.correo,
+                `${appointment.cliente.nombre} ${appointment.cliente.apellido_paterno}`,
+                {
+                    fecha: appointment.fecha,
+                    hora: appointment.hora,
+                    motivo: data.motivo,
+                }
+            );
+        }
+
+        return savedRejection;
     }
+
 }

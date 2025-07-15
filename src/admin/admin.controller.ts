@@ -32,6 +32,7 @@ import { LoggerService } from 'src/services/logger/logger.service';
 import { Roles } from 'src/role/role.decorator';
 import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { RoleGuard } from 'src/role/guards/role/role.guard';
+import { AcceptCashService } from './accept-cash/accept-cash.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -42,10 +43,8 @@ export class AdminController {
     private readonly corporateimageService: CorporateimageService,
     private readonly contactService: ContactService,
     private readonly policeService: PoliceService,
+    private readonly acceptCashService: AcceptCashService, // <--- Agregado aquí
     private logger: LoggerService,
-
-    
-
   ) { }
 
 
@@ -91,7 +90,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateData: UpdateServiceDto,
     @Request() req: any
   ): Promise<ServiceEntity> {
-   
+
     return this.serviceService.updateService(id, updateData);
   }
 
@@ -179,7 +178,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateData: UpdateCorporateImageDto,
     @Request() req: any
   ): Promise<CorporateImage> {
-    
+
     return this.corporateimageService.update(id, updateData);
   }
 
@@ -212,7 +211,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updateContactDto: UpdateContactDto,
     @Request() req: any
   ): Promise<Contact> {
-   
+
     return this.contactService.update(id, updateContactDto);
   }
 
@@ -245,7 +244,7 @@ export class AdminController {
     @Body(new ValidationPipe()) createPoliceDto: CreatePoliceDto,
     @Request() req: any
   ): Promise<Police> {
-    
+
     return this.policeService.create(createPoliceDto);
   }
 
@@ -257,7 +256,7 @@ export class AdminController {
     @Body(new ValidationPipe()) updatePoliceDto: UpdatePoliceDto,
     @Request() req: any
   ): Promise<Police> {
-    
+
     return this.policeService.update(id, updatePoliceDto);
   }
 
@@ -312,5 +311,24 @@ export class AdminController {
     return this.policeService.actualizarEstado(id);
   }
 
+
+  //Pago e efectivo
+  // Obtener reparaciones en proceso (pendientes de confirmar)
+  @Get('repairs-in-process')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async getRepairsInProcess() {
+    return this.acceptCashService.getRepairsInProcess();
+  }
+
+  // Confirmar pago en efectivo (cambia estado a 'pagado')
+  @Patch('confirm-cash-payment/:id')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async confirmCashPayment(
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    return this.acceptCashService.confirmCashPayment(id);
+  }
 
 }

@@ -1,6 +1,6 @@
 
 
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import { VehiclesService } from './vehicles/vehicles.service';
 
@@ -13,6 +13,13 @@ import { RoleGuard } from 'src/role/guards/role/role.guard';
 import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { AppointmentClientService } from './appointment-client/appointment-client.service';
 import { VwAppointmentDetails } from './appointment-client/view/vw-appointment-details.entity';
+import { RepairPaymentService } from './repair-payment/repair-payment.service';
+import { HistoryRepairsService } from './history-repairs/history-repairs.service';
+import { VistaRepairsEmpleados } from './history-repairs/view/vista_repairs_empleados';
+import { RepairPaymentEntity } from './repair-payment/entity/repair.entity';
+import { CreateAppointmentDto } from './appointment-client/dto/create-appointment-client.dto';
+import { UpdateAppointmentDto } from './appointment-client/dto/update-appointment-client.dto';
+import { CreateCancellationDto } from './appointment-client/dto/create-cancellation.dto';
 
 
 @Controller('client')
@@ -20,7 +27,8 @@ export class ClientController {
   constructor(
     private readonly vehiclesService: VehiclesService,
     private readonly appointmentClientService: AppointmentClientService,
-
+    private readonly repairService: RepairPaymentService,
+    private readonly historyRepairsService: HistoryRepairsService,
   ) { }
 
   @Post('new-vehicle')
@@ -70,6 +78,110 @@ export class ClientController {
     }
 
     return this.appointmentClientService.getAppointmentsByClientId(idCliente);
+  }
+
+
+  //Apartado para pagos de reparaciones
+  @Get('payment')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async getAllRepairsPay(@Req() req: any): Promise<RepairPaymentEntity[]> {
+    const idCliente = req.user?.userId; // Usa la clave correcta del token JWT
+    if (!idCliente) {
+      throw new Error('ID del cliente no disponible en el token.');
+    }
+    return this.repairService.getRepairsPayment(idCliente);
+  }
+
+  @Put('repair/:id/set-in-process')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async setRepairInProcess(
+    @Param('id') idReparacion: number,
+    @Req() req: any,
+  ): Promise<RepairPaymentEntity> {
+    const idCliente = req.user?.userId;
+    if (!idCliente) {
+      throw new BadRequestException('ID del cliente no disponible en el token.');
+    }
+
+    try {
+      const repairActualizada = await this.repairService.markRepairAsInProcess(idReparacion, idCliente);
+      return repairActualizada;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+
+  @Get('repair-history')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async getRepairHistory(@Req() req: any): Promise<VistaRepairsEmpleados[]> {
+    const idCliente = req.user?.userId;
+
+    if (!idCliente) {
+      throw new BadRequestException('ID del cliente no disponible en el token.');
+    }
+
+    return this.historyRepairsService.obtenerPorCliente(idCliente);
+  }
+
+  @Post('appointments')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async createAppointment(@Req() req: any, @Body() body: CreateAppointmentDto) {
+    const idCliente = req.user?.userId;
+
+    if (!idCliente) {
+      throw new BadRequestException('ID del cliente no disponible en el token.');
+    }
+
+    return await this.appointmentClientService.createAppointment(body, idCliente);
+  }
+
+  @Get('appointments/:id')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async getAppointmentById(@Param('id') id: string) {
+    const cita = await this.appointmentClientService.getAppointmentById(+id);
+    if (!cita) {
+      throw new NotFoundException('Cita no encontrada');
+    }
+    return cita;
+  }
+
+  @Patch('appointments/:id/fecha')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateAppointmentFechaHora(
+    @Param('id') id: string,
+    @Body() body: UpdateAppointmentDto,
+  ) {
+    return await this.appointmentClientService.updateAppointmentDateTime(+id, body);
+  }
+
+  @Post('appointments/:id/cancel')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async cancelAppointment(
+    @Param('id') id: string,
+    @Body() cancellationDto: CreateCancellationDto,
+    @Req() req: any,
+  ): Promise<{ message: string }> {
+    const idCliente = req.user?.userId;
+    if (!idCliente) {
+      throw new BadRequestException('ID del cliente no disponible en el token.');
+    }
+
+    const cita = await this.appointmentClientService.getAppointmentById(+id);
+    if (!cita) {
+      throw new NotFoundException('Cita no encontrada');
+    }
+    if (cita.idCliente !== idCliente) {
+      throw new BadRequestException('No puedes cancelar una cita que no es tuya');
+    }
+
+    return this.appointmentClientService.cancelAppointment(+id, cancellationDto);
   }
 
 

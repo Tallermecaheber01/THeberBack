@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('repairs') // Nombre de la tabla en la base de datos
-export class RepairEntity {
+export class StateRepairEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
