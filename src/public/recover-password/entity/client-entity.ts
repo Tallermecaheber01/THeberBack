@@ -2,6 +2,8 @@ import { AppointmentEntity } from "src/employ/appointment/entities/appointment.e
 import { QuestionSecretEntity } from "src/public/register/entity/question-secret.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { VehicleEntity } from "src/client/vehicles/entities/vehicle.entity";
+import { SmartwatchLinkEntity } from 'src/client/smartwatch/smartwatch-link.entity';
+
 
 @Entity('clients')
 export class ClientEntity {
@@ -52,4 +54,10 @@ export class ClientEntity {
 
     @OneToMany(()=> VehicleEntity,(vehicle) => vehicle.idPropietario)
     vehiculos: VehicleEntity[]
+
+    @Column({ type: 'text', nullable: true })
+    fcm_token?: string;
+    //para vincularse con la tabla de smartwatch
+    @OneToMany(() => SmartwatchLinkEntity, link => link.user)
+    smartwatchLinks: SmartwatchLinkEntity[];
 }

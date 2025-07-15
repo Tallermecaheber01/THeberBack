@@ -8,7 +8,7 @@ export enum PoliceEstado {
 export class CreatePoliceDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(1500)
+  @MaxLength(10000)
   descripcion: string;
 
   @IsNotEmpty()

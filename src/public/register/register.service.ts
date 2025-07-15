@@ -12,6 +12,8 @@ import axios from 'axios';
 import { CreateClientDto } from './dto/create-client-dto';
 import { QuestionSecretEntity } from './entity/question-secret.entity';
 import { LoggerService } from 'src/services/logger/logger.service';
+import { NotFoundException } from '@nestjs/common';
+
 
 @Injectable()
 export class RegisterService {
@@ -235,5 +237,25 @@ export class RegisterService {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         return hashedPassword;
     }
+
+    ///tokens de smartwatch 
+
+      async updateFcmToken(id: number, fcmToken: string): Promise<ClientEntity> {
+        const client = await this.clientRepository.findOne({ where: { id } });
+        if (!client) {
+        throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+        }
+        client.fcm_token = fcmToken;
+        return this.clientRepository.save(client);
+    }
+
+    async findClientById(id: number): Promise<ClientEntity> {
+        const client = await this.clientRepository.findOne({ where: { id } });
+        if (!client) {
+        throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+        }
+        return client;
+    }
+
 
 }

@@ -10,7 +10,7 @@ export class Police {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'varchar', length: 1500 })
+  @Column({ type: 'varchar', length: 10000})
   descripcion: string;
 
   @Column({ type: 'datetime' })

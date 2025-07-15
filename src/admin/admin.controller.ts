@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Request, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Request, UseGuards, ValidationPipe, Query  } from '@nestjs/common';
 
 import { ServiceService } from './service/service.service';
 
@@ -34,6 +34,30 @@ import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { RoleGuard } from 'src/role/guards/role/role.guard';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { DemarcationService } from './demarcation/demarcation.service';
+import { UpdateDemarcationDto } from './demarcation/dto/update-demarcation.dto';
+import { DemarcationEntity } from './demarcation/entities/demarcation.entity';
+import {SecurityPolicyService} from './security_policy/securityPolicy.service'
+import { UpdateSecurityPolicyDto } from './security_policy/dto/update-securitypolicy.dto';
+import { SecurityPolicyEntity } from './security_policy/entities/securityPolicy.entity';
+import { TermsService } from './terms/terms.service';
+import { UpdateTermsDto } from './terms/dto/update-terms.dto';
+import { TermsEntity } from './terms/entities/terms.entity';
+//FAQ
+import { CreateFaqDto } from './FAQ/dto/create_FAQ.dto';
+import { UpdateFaqDto } from './FAQ/dto/update_FAQ.dto';
+import { DeleteFaqDto } from './FAQ/dto/delete_FAQ.dto';
+import { Faq } from './FAQ/entities/FAQ.entity';
+import { FaqService } from './FAQ/faq.service';
+//quiz
+import { CreateQuizQuestionDto } from './quizQuestion/dto/create_quizQuestion.dto';
+import { UpdateQuizQuestionDto } from './quizQuestion/dto/update_quizQuestion.dto';
+import { DeleteQuizQuestionDto } from './quizQuestion/dto/delete_quizQuestion.dto';
+import { QuizQuestionService } from './quizQuestion/quizQuestion.service';
+import { QuizContactService } from './quizContact/quizContact.service';
+import { UpdateQuizContactDto } from './quizContact/dto/update_quizContac.dto';
+import { QuizContact } from './quizContact/entities/quizContact.entity';
+
 
 @Controller('admin')
 export class AdminController {
@@ -43,8 +67,12 @@ export class AdminController {
     private readonly contactService: ContactService,
     private readonly policeService: PoliceService,
     private logger: LoggerService,
-
-    
+    private readonly demarcationService: DemarcationService,
+    private readonly securityPolicyService: SecurityPolicyService,
+    private readonly termsService: TermsService,
+    private readonly faqService: FaqService,
+    private readonly quizQuestionService: QuizQuestionService,  
+    private readonly quizContactService: QuizContactService,
 
   ) { }
 
@@ -312,5 +340,169 @@ export class AdminController {
     return this.policeService.actualizarEstado(id);
   }
 
+  //demarcation
+    @Get('demarcations')
+  async getAllDemarcations(): Promise<DemarcationEntity[]> {
+    return this.demarcationService.findAll();
+  }
 
+  //actualiza 
+  @Patch('demarcations/:id')
+    @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateDemarcation(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe({ whitelist: true })) dto: UpdateDemarcationDto
+  ): Promise<DemarcationEntity> {
+    return this.demarcationService.update(id, dto);
+  }
+
+  //Políticas de seguridad
+    @Get('security-policies')
+  async getAllSecurityPolicies(): Promise<SecurityPolicyEntity[]> {
+    return this.securityPolicyService.findAll();
+  }
+
+  @Patch('security-policies/:id')
+    @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateSecurityPolicy(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe({ whitelist: true })) dto: UpdateSecurityPolicyDto
+  ): Promise<SecurityPolicyEntity> {
+    return this.securityPolicyService.update(id, dto);
+  }
+
+
+    //para traer todos los terminos
+  @Get('terms')
+  async getAllTerms(): Promise<TermsEntity[]> {
+    return this.termsService.findAll();
+  }
+
+  //actualiza
+  @Patch('terms/:id')
+    @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateTerms(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe({ whitelist: true })) dto: UpdateTermsDto
+  ): Promise<TermsEntity> {
+    return this.termsService.update(id, dto);
+  }
+
+  //faq
+  @Post('new-faq')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async createFaq(
+    @Body(new ValidationPipe()) createFaqDto: CreateFaqDto,
+    @Request() req: any
+  ): Promise<Faq> {
+    return this.faqService.create(createFaqDto);
+  }
+
+  @Get('all-faqs')
+  async getAllFaqs(): Promise<Faq[]> {
+    return this.faqService.findAll();
+  }
+
+    @Get('faq/search')
+  async searchFaqs(@Query('q') query: string): Promise<Faq[]> {
+    return this.faqService.searchPartial(query);
+  }
+
+  @Get('faq/exact')
+  async findFaqByPregunta(
+    @Query('pregunta') pregunta: string
+  ): Promise<Faq | null> {
+    return this.faqService.findByPregunta(pregunta);
+  }
+
+
+  @Get('faq/:id')
+  async getFaqById(
+    @Param('id', ParseIntPipe) id_faq: number
+  ): Promise<Faq> {
+    return this.faqService.findOneById(id_faq);
+  }
+
+  @Patch('update-faq')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateFaq(
+    @Body(new ValidationPipe({ whitelist: true })) updateFaqDto: UpdateFaqDto,
+    @Request() req: any
+  ): Promise<Faq> {
+    return this.faqService.update(updateFaqDto);
+  }
+
+  @Delete('delete-faq/:id')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async deleteFaq(
+    @Param('id', ParseIntPipe) id_faq: number,
+    @Request() req: any
+  ): Promise<void> {
+    await this.faqService.remove({ id_faq });
+  }
+
+  //quizQuestion
+  @Post('quiz/new-question')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async createQuizQuestion(
+    @Body(new ValidationPipe()) createDto: CreateQuizQuestionDto,
+    @Request() req: any
+  ) {
+    return this.quizQuestionService.create(createDto);
+  }
+
+  @Get('quiz/questions')
+  async getAllQuizQuestions() {
+    return this.quizQuestionService.findAll();
+  }
+
+  @Get('quiz/question/:id')
+  async getQuizQuestionById(
+    @Param('id', ParseIntPipe) id: number
+  ) {
+    return this.quizQuestionService.findOne(id);
+  }
+
+  @Patch('quiz/update-question')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateQuizQuestion(
+    @Body(new ValidationPipe({ whitelist: true })) updateDto: UpdateQuizQuestionDto,
+    @Request() req: any
+  ) {
+    return this.quizQuestionService.update(updateDto);
+  }
+
+  @Delete('quiz/delete-question')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async deleteQuizQuestion(
+    @Body(new ValidationPipe()) deleteDto: DeleteQuizQuestionDto,
+    @Request() req: any
+  ) {
+    await this.quizQuestionService.remove(deleteDto);
+  }
+
+  // quizContact
+  @Patch('quiz/contact')
+  @Roles('administrador')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateQuizContact(
+    @Body(new ValidationPipe({ whitelist: true })) updateDto: UpdateQuizContactDto,
+    @Request() req: any
+  ): Promise<QuizContact> {
+    return this.quizContactService.update(updateDto);
+  }
+
+  @Get('quiz/contacts')
+  async getQuizContact(): Promise<QuizContact> {
+    return this.quizContactService.findOne();
+  }
 }

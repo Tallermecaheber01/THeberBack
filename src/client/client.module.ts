@@ -6,6 +6,7 @@ import { ClientController } from './client.controller';
 
 //Services
 import { VehiclesService } from './vehicles/vehicles.service';
+import { FeedbackService } from './feedback/feedback.service';
 
 //Entities
 import { VehicleEntity } from './vehicles/entities/vehicle.entity';
@@ -21,7 +22,10 @@ import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { UserViewEntity } from 'src/public/register/view/vw-users-entity';
 import { VehicleTypeEntity } from 'src/admin/service/entities/vehicle.entity';
 import { BrandEntity } from 'src/admin/service/entities/brand.entity';
-
+import { SmartwatchLinkEntity } from './smartwatch/smartwatch-link.entity';
+import {NotificationService} from './smartwatch/notification.service';
+import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appointment-reminder.entity'
+import { FeedbackEntity } from './feedback/entities/feedback.entity';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -38,19 +42,19 @@ import { BrandEntity } from 'src/admin/service/entities/brand.entity';
         entities: [
           VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
           AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity,
-          VehicleTypeEntity, BrandEntity,ServiceEntity
+          VehicleTypeEntity, BrandEntity,ServiceEntity, SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity
         ],
         synchronize: false,
       }),
       inject: [ConfigService]
     }),
     TypeOrmModule.forFeature([VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
-      AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity, VehicleTypeEntity,
-      BrandEntity
+      AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity, VehicleTypeEntity, SmartwatchLinkEntity,
+      BrandEntity, AppointmentReminderEntity,FeedbackEntity,
     ])],
   controllers: [ClientController],
-  providers: [ VehiclesService],
-  exports: []
+  providers: [ VehiclesService, NotificationService, FeedbackService],
+  exports: [FeedbackService]
 })
 export class ClientModule implements OnModuleInit {
   onModuleInit() {
