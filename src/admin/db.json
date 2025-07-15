@@ -1,0 +1,164 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "question_text": "¿Con qué herramienta se aprieta un tornillo?",
+      "option_a": "Destornillador",
+      "option_b": "Martillo",
+      "option_c": "Llave inglesa",
+      "correct_option": "A"
+    },
+    {
+      "id": 2,
+      "question_text": "¿Qué líquido se usa para frenos?",
+      "option_a": "Aceite de motor",
+      "option_b": "Líquido de frenos",
+      "option_c": "Agua",
+      "correct_option": "B"
+    },
+    {
+      "id": 3,
+      "question_text": "¿Qué componente regula la mezcla de aire y combustible?",
+      "option_a": "Carburador",
+      "option_b": "Alternador",
+      "option_c": "Radiador",
+      "correct_option": "A"
+    },
+    {
+      "id": 4,
+      "question_text": "¿Dónde se aloja la batería del vehículo?",
+      "option_a": "Maletero",
+      "option_b": "Interior del motor",
+      "option_c": "Debajo de los asientos",
+      "correct_option": "B"
+    },
+    {
+      "id": 5,
+      "question_text": "¿Qué pieza transmite potencia desde el motor a las ruedas?",
+      "option_a": "Motor de arranque",
+      "option_b": "Transmisión",
+      "option_c": "Filtro de aire",
+      "correct_option": "B"
+    },
+    {
+      "id": 6,
+      "question_text": "¿Para qué sirve el filtro de aire?",
+      "option_a": "Limpiar el aire que entra al motor",
+      "option_b": "Enfriar el motor",
+      "option_c": "Lubricar el motor",
+      "correct_option": "A"
+    },
+    {
+      "id": 7,
+      "question_text": "¿Qué bujía se encarga de la chispa en el motor?",
+      "option_a": "Bujía de encendido",
+      "option_b": "Bujía de precalentamiento",
+      "option_c": "Bujía de buceo",
+      "correct_option": "A"
+    },
+    {
+      "id": 8,
+      "question_text": "¿Cuál es la función del alternador?",
+      "option_a": "Arrancar el motor",
+      "option_b": "Cargar la batería",
+      "option_c": "Frenar el vehículo",
+      "correct_option": "B"
+    },
+    {
+      "id": 9,
+      "question_text": "¿Cómo se llama la pieza que conecta la llanta al eje?",
+      "option_a": "Cardán",
+      "option_b": "Cigüeñal",
+      "option_c": "Válvula",
+      "correct_option": "A"
+    },
+    {
+      "id": 10,
+      "question_text": "¿Qué aceite se cambia en un servicio de motor?",
+      "option_a": "Aceite de frenos",
+      "option_b": "Aceite hidráulico",
+      "option_c": "Aceite de motor",
+      "correct_option": "C"
+    },
+    {
+      "id": 11,
+      "question_text": "¿Qué sistema enfría el motor?",
+      "option_a": "Sistema de frenos",
+      "option_b": "Sistema de refrigeración",
+      "option_c": "Sistema de escape",
+      "correct_option": "B"
+    },
+    {
+      "id": 12,
+      "question_text": "¿Qué elemento absorbe impactos al conducir?",
+      "option_a": "Amortiguador",
+      "option_b": "Radiador",
+      "option_c": "Catalizador",
+      "correct_option": "A"
+    },
+    {
+      "id": 13,
+      "question_text": "¿Cuál es el combustible más común en un taller?",
+      "option_a": "Gasolina",
+      "option_b": "Propano",
+      "option_c": "Gasóleo",
+      "correct_option": "A"
+    },
+    {
+      "id": 14,
+      "question_text": "¿Qué herramienta se usa para medir presión de llantas?",
+      "option_a": "Manómetro",
+      "option_b": "Voltímetro",
+      "option_c": "Multímetro",
+      "correct_option": "A"
+    },
+    {
+      "id": 15,
+      "question_text": "¿Qué pieza reduce emisiones contaminantes?",
+      "option_a": "Catalizador",
+      "option_b": "Filtro de aire",
+      "option_c": "Radiador",
+      "correct_option": "A"
+    },
+    {
+      "id": 16,
+      "question_text": "¿Qué líquido enfría el motor?",
+      "option_a": "Refrigerante",
+      "option_b": "Aceite de motor",
+      "option_c": "Líquido de transmisión",
+      "correct_option": "A"
+    },
+    {
+      "id": 17,
+      "question_text": "¿Dónde se encuentra el filtro de aceite?",
+      "option_a": "En el cárter",
+      "option_b": "En la cabina",
+      "option_c": "En el radiador",
+      "correct_option": "A"
+    },
+    {
+      "id": 18,
+      "question_text": "¿Qué componente reduce el ruido del escape?",
+      "option_a": "Mofle",
+      "option_b": "Amortiguador",
+      "option_c": "Filtro de gasolina",
+      "correct_option": "A"
+    },
+    {
+      "id": 19,
+      "question_text": "¿Qué herramienta sirve para aflojar tuercas?",
+      "option_a": "Llave de impacto",
+      "option_b": "Destornillador",
+      "option_c": "Sierra",
+      "correct_option": "A"
+    },
+    {
+      "id": 20,
+      "question_text": "¿Qué dispositivo enciende el motor?",
+      "option_a": "Encendedor",
+      "option_b": "Motor de arranque",
+      "option_c": "Batería",
+      "correct_option": "B"
+    }
+  ]
+}

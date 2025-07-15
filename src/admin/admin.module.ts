@@ -12,6 +12,13 @@ import { CorporateimageService } from './corporateimage/corporateimage.service';
 import { AppointmentService } from 'src/employ/appointment/appointment.service';
 import { PoliceService } from './policies/policies.service';
 import { LoggerService } from 'src/services/logger/logger.service';
+import { FeedbackService } from 'src/client/feedback/feedback.service';
+import { FeedbackEntity } from 'src/client/feedback/entities/feedback.entity';
+import { DemarcationService } from './demarcation/demarcation.service';
+//faq
+import { FaqService } from './FAQ/faq.service';  // en minúsculas
+import { Faq } from './FAQ/entities/faq.entity';  // también minúsculas
+
 
 //Entities
 import { ServiceEntity } from './service/entities/service.entity';
@@ -48,6 +55,23 @@ import { VwAppointmentDetails } from 'src/client/appointment-client/view/vw-appo
 import {AppointmentPendingChangeViewEntity} from 'src/employ/entities-view/appointment_change_view';
 import { VistaRepairsEmpleados } from 'src/client/history-repairs/view/vista_repairs_empleados';
 
+import {SmartwatchLinkEntity} from 'src/client/smartwatch/smartwatch-link.entity';
+import {NotificationService} from 'src/client/smartwatch/notification.service';
+import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appointment-reminder.entity'
+import { DemarcationEntity } from './demarcation/entities/demarcation.entity';
+import { SecurityPolicyService } from './security_policy/securityPolicy.service';
+import { SecurityPolicyEntity } from './security_policy/entities/securityPolicy.entity';
+import { TermsEntity } from './terms/entities/terms.entity';
+import { TermsService } from './terms/terms.service';
+
+//quiz
+import { QuizQuestionService } from './quizQuestion/quizQuestion.service';
+import { QuizQuestion } from './quizQuestion/entities/quizQuestion.entity';
+import { QuizContactService } from './quizContact/quizContact.service';
+import { QuizContact } from './quizContact/entities/quizContact.entity';
+
+
+
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -67,7 +91,9 @@ import { VistaRepairsEmpleados } from 'src/client/history-repairs/view/vista_rep
           QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
           CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
           RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
-          AppointmentPendingChangeViewEntity
+          AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, DemarcationEntity,
+          SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,
+
         ],
         synchronize: false,
       }),
@@ -79,7 +105,9 @@ import { VistaRepairsEmpleados } from 'src/client/history-repairs/view/vista_rep
       QuestionSecretEntity, ClientEntity, VehicleEntity, UserViewEntity, UserVehicleViewEntity, RepairEntity,
       CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
       RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
-      AppointmentPendingChangeViewEntity
+      AppointmentPendingChangeViewEntity,  SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, DemarcationEntity, 
+      SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact
+
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -87,8 +115,9 @@ import { VistaRepairsEmpleados } from 'src/client/history-repairs/view/vista_rep
     })
   ],
   controllers: [AdminController],
-  providers: [ServiceService, ContactService, CorporateimageService, PoliceService,LoggerService, AcceptCashService],
-  exports: [ServiceService, CorporateimageService], // Exporta si se necesita en otros módulos
+  providers: [ServiceService, ContactService, CorporateimageService, PoliceService,LoggerService, AcceptCashService, NotificationService, FeedbackService,  DemarcationService,
+    SecurityPolicyService, TermsService, FaqService,  QuizQuestionService, QuizContactService,],
+  exports: [ServiceService, CorporateimageService, FaqService, QuizQuestionService, QuizContactService,], // Exporta si se necesita en otros módulos
 })
 export class AdminModule implements OnModuleInit {
   onModuleInit() {

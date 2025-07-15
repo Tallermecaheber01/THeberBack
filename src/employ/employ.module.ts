@@ -23,6 +23,10 @@ import { AppointmentRejectionEntity } from './appointment/entities/appointment-r
 import { VehicleEntity } from 'src/client/vehicles/entities/vehicle.entity';
 import { QuestionSecretEntity } from 'src/public/register/entity/question-secret.entity';
 import { Contact } from 'src/admin/contact/entities/contacts.entity';
+//notificacion
+import { NotificationModule } from 'src/client/smartwatch/notification.module';
+import {SmartwatchLinkEntity} from 'src/client/smartwatch/smartwatch-link.entity';
+import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appointment-reminder.entity'
 
 //Views
 import { AppointmentServicesViewEntity } from './entities-view/appointment_services_view';
@@ -47,7 +51,8 @@ import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_
         entities: [AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
           AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity
+          AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity
+
         ],
         synchronize: false,
       }),
@@ -57,12 +62,13 @@ import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_
       AppointmentEntity, UserVehicleViewEntity, ServiceEntity,
       AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
       CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
-      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity
+      AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: { /*expiresIn: '1h'*/ },
-    })
+    }), 
+    NotificationModule,
   ],
   controllers: [EmployController],
   providers: [AppointmentService, RepairService, LoggerService,EmailService],

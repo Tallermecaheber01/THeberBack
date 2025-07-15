@@ -97,4 +97,17 @@ export class PublicController {
     async getAllQuestions() {
         return this.registerService.getAllQuestions();
     }
+
+    //token para smartwatch
+    @Post('update-fcm-token')
+    async updateFcmToken(@Body() body: { id: number, fcmToken: string }) {
+        const { id, fcmToken } = body;
+        return this.registerService.updateFcmToken(id, fcmToken);
+    }
+
+    @Get('client/:id')
+    async findClientById(@Param('id') id: number) {
+        return this.registerService.findClientById(id);
+    }
+
 }

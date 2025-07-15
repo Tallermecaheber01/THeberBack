@@ -30,7 +30,11 @@ import { AppointmentRejectionEntity } from './employ/appointment/entities/appoin
 import { QuestionSecretEntity } from './public/register/entity/question-secret.entity';
 import { CorporateImage } from './admin/corporateimage/entities/corporateimage.entity';
 import { Contact } from './admin/contact/entities/contacts.entity';
+
 import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
+
+import { SmartwatchLinkEntity } from './client/smartwatch/smartwatch-link.entity';
+
 
 @Module({
   imports: [
@@ -53,7 +57,7 @@ import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
           AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity, LogEntity, ClientEntity, UserViewEntity,
           AuthorizedPersonnelEntity, AppointmentWaitingViewEntity, AppointmentRejectionEntity, QuestionSecretEntity,
-          CorporateImage, Contact
+          CorporateImage, Contact, SmartwatchLinkEntity, 
         ],
         synchronize: false,  // No sincronizar automáticamente las tablas en producción
       }),

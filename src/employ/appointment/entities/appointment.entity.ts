@@ -5,6 +5,7 @@ import { AppointmentServiceEntity } from "./appointment-services-entity";
 import { AppointmentCancellationEntity } from "./appointment-cancellation-entity";
 import { ClientEntity } from "src/public/recover-password/entity/client-entity";
 import { AuthorizedPersonnelEntity } from "src/public/recover-password/entity/authorized-personnel-entity";
+import { AppointmentReminderEntity } from './appointment-reminder.entity';
 
 // Definir los posibles estados de la cita
 export enum AppointmentStatus {
@@ -60,4 +61,7 @@ export class AppointmentEntity {
 
     @OneToMany(() => AppointmentRejectionEntity, (rejection) => rejection.appointment, { cascade: true })
     rejections: AppointmentRejectionEntity[];
+
+    @OneToMany(() => AppointmentReminderEntity, rem => rem.appointment)
+    reminders: AppointmentReminderEntity[];
 }

@@ -17,6 +17,9 @@ import { AuthGuard } from 'src/role/guards/authguard/authguard.guard';
 import { RoleGuard } from 'src/role/guards/role/role.guard';
 import { LoggerService } from 'src/services/logger/logger.service';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NotificationService } from 'src/client/smartwatch/notification.service';
 
 
 
@@ -25,6 +28,7 @@ export class EmployController {
     constructor(
         private readonly appointmentService: AppointmentService,
         private readonly repairService: RepairService, //se crea el objeto del servicio
+        private readonly notificationService: NotificationService, 
         private readonly logger: LoggerService,
 
     ) { }
@@ -162,10 +166,6 @@ export class EmployController {
         };
     }
 
-
-
-
-
     /**Aqui se utiliza la funcion del servicio de repair, de igual
      * forma de usa el dto, para especificar los datos que se enviaran
      */
@@ -180,13 +180,24 @@ export class EmployController {
         const repair = await this.repairService.createNewRepair(repairData);
         const updateData: UpdateAppointmentDto = { estado: AppointmentStatus.COMPLETED };
 
-        await this.appointmentService.updateAppointmentIfConfirmed(
+        const updatedAppointment = await this.appointmentService.updateAppointmentIfConfirmed(
             repairData.idCita,
             updateData
         );
 
 
-
+         const appointmentEntity = await this.appointmentService.getAppointmentEntityById(repairData.idCita);
+        const cliente = appointmentEntity.cliente;
+        if (cliente?.fcm_token) {
+            // Enviar notificación
+            await this.notificationService.sendNotificationToSmartwatch({
+            title: 'Servicio finalizado',
+            message: `El servicio de la cita del ${appointmentEntity.fecha} a las ${appointmentEntity.hora} a finalizado.`,
+            citaId: repairData.idCita,
+            tipo: 'finalizada', 
+            token: cliente.fcm_token,
+            });
+        }
 
         return repair;
     }
@@ -215,6 +226,13 @@ export class EmployController {
 
 
         return this.repairService.updateRepair(id, updateRepairDto);
+    }
+
+
+    @Post('trigger-reminders')
+    async triggerReminders() {
+    await this.appointmentService.handleHourlyAppointmentReminders();
+    return { ok: true };
     }
 
 }

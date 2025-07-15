@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,NotFoundException, Logger  } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { EmailService } from './email.service';
+import { Cron } from '@nestjs/schedule';
+
 
 import { AppointmentEntity } from './entities/appointment.entity';
 import { AppointmentServiceEntity } from './entities/appointment-services-entity';
@@ -10,6 +12,8 @@ import { AppointmentRejectionEntity } from './entities/appointment-rejection-ent
 import { CancelledAppointmentsViewEntity } from '../entities-view/appointments_cancelled_view';
 import { UserVehicleViewEntity } from '../entities-view/user-vehicle.view.entity';
 import { ServiceEntity } from 'src/admin/service/entities/service.entity';
+
+import { AppointmentReminderEntity, ReminderType } from './entities/appointment-reminder.entity';
 
 import { AuthorizedPersonnelEntity } from 'src/public/recover-password/entity/authorized-personnel-entity';
 import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
@@ -21,8 +25,11 @@ import { CreateAppointmentRejectionDto } from './dto/create-appointment-rejectio
 import { AppointmentWaitingViewEntity } from './../entities-view/appointment_waiting_view';
 import { AppointmentPendingChangeViewEntity } from '../entities-view/appointment_change_view';
 
+import { NotificationService } from 'src/client/smartwatch/notification.service';
+
 @Injectable()
 export class AppointmentService {
+    private readonly logger = new Logger(AppointmentService.name);
     constructor(
         private readonly emailService: EmailService,
 
@@ -59,8 +66,23 @@ export class AppointmentService {
         private readonly serviceRepository: Repository<ServiceEntity>,
 
         @InjectRepository(CancelledAppointmentsViewEntity)
-        private readonly cancelledAppointmentsRepository: Repository<CancelledAppointmentsViewEntity>
+        private readonly cancelledAppointmentsRepository: Repository<CancelledAppointmentsViewEntity>,
+
+        @InjectRepository(AppointmentReminderEntity)
+        private readonly reminderRepository: Repository<AppointmentReminderEntity>,
+
+        private readonly notificationService: NotificationService,
     ) { }
+
+
+private getAppointmentDateTime(appointment: AppointmentEntity): Date | null {
+    const fecha = appointment.fecha;  // "2025-06-20"
+    let hora = appointment.hora;      // "14:30" or "14:30:00"
+    if (/^\d{2}:\d{2}$/.test(hora)) hora += ':00';
+    const iso = `${fecha}T${hora}`;
+    const dt = new Date(iso);
+    return isNaN(dt.getTime()) ? null : dt;
+  }
 
     // Método para asignar una nueva cita con servicios
     async createNewAppointmentWithServices(
@@ -102,6 +124,18 @@ export class AppointmentService {
         if (!savedAppointment.id) {
             throw new Error("❌ No se pudo guardar la cita correctamente");
         }
+
+        //la cita empieza 
+        if (cliente.fcm_token) {
+            await this.notificationService.sendNotificationToSmartwatch({
+                title: 'Cita asignada',
+                message: `Tu cita para ${savedAppointment.fecha} a las ${savedAppointment.hora} ha sido asignada.`,
+                citaId: savedAppointment.id,
+                tipo: 'proxima',
+                token: cliente.fcm_token,
+            });
+        }
+        //termina
 
         // Crear los servicios y asociarlos a la cita
         const servicesToCreate = (servicesData || []).map((service) => ({
@@ -183,7 +217,109 @@ export class AppointmentService {
         return Object.values(groupedAppointments);
     }
 
+    async getAppointmentsForClient(clientId: number): Promise<any[]> {
+    const cliente = await this.clientRepository.findOne({ where: { id: clientId } });
+    if (!cliente) throw new NotFoundException(`Cliente con ID ${clientId} no encontrado`);
 
+    const rows = await this.appointmentServicesViewRepository.find({
+      where: { cliente_id: clientId },
+    });
+    if (!rows.length) return [];
+
+    const grouped = rows.reduce((acc, curr) => {
+      if (!acc[curr.appointment_id]) {
+        acc[curr.appointment_id] = {
+          appointment_id: curr.appointment_id,
+          fecha: curr.fecha,
+          hora: curr.hora,
+          estado: curr.estado,
+          services: [],
+          // añade otros campos si lo deseas
+        };
+      }
+      acc[curr.appointment_id].services.push({
+        servicio: curr.servicio,
+        costo: curr.costo,
+      });
+      return acc;
+    }, {} as Record<number, any>);
+
+    return Object.values(grouped);
+  }
+
+
+  // 4) Tarea programada: cada hora enviar recordatorios
+  @Cron('0 * * * *')
+  async handleHourlyAppointmentReminders() {
+    this.logger.log('🔔 Revisando recordatorios de citas...');
+    const now = new Date();
+
+    // Citas confirmadas con cliente vinculado
+    const citas = await this.appointmentRepository.find({
+      where: { estado: 'Confirmada' },  // según AppointmentStatus.CONFIRMED
+      relations: ['cliente'],
+    });
+
+    for (const cita of citas) {
+      try {
+        const { cliente } = cita;
+        if (!cliente?.fcm_token) continue;
+
+        const citaDate = this.getAppointmentDateTime(cita);
+        if (!citaDate) continue;
+
+        const diffH = (citaDate.getTime() - now.getTime()) / 36e5;
+        let tipo: ReminderType | null = null;
+
+        if (diffH <= 48 && diffH > 24) tipo = 'TWO_DAYS';
+        else if (diffH <= 24 && diffH > 4) tipo = 'ONE_DAY';
+        else if (diffH <= 4) tipo = 'FOUR_HOURS';
+        if (!tipo) continue;
+
+        // ¿Ya enviado?
+        const sent = await this.reminderRepository.findOne({
+          where: { appointmentId: cita.id, type: tipo },
+        });
+        if (sent) continue;
+
+        // Contenido
+        const title = tipo === 'TWO_DAYS'
+          ? 'Quedan 2 días para tu cita'
+          : tipo === 'ONE_DAY'
+            ? 'Queda 1 día para tu cita'
+            : 'Quedan 4 horas para tu cita';
+
+        const message = tipo === 'TWO_DAYS'
+          ? `Tu cita es el ${cita.fecha} a las ${cita.hora}. Falta 2 días.`
+          : tipo === 'ONE_DAY'
+            ? `Tu cita será mañana ${cita.fecha} a las ${cita.hora}.`
+            : `Tu cita es hoy a las ${cita.hora}.`;
+
+        // Enviar por Firebase
+        await this.notificationService.sendNotificationToSmartwatch({
+          title,
+          message,
+          citaId: cita.id,
+          tipo: 'proxima',
+          token: cliente.fcm_token,
+        });
+
+        // Registrar recordatorio
+        const rem = this.reminderRepository.create({
+          appointment: cita,
+          appointmentId: cita.id,
+          type: tipo,
+        });
+        await this.reminderRepository.save(rem);
+
+        this.logger.log(`Recordatorio [${tipo}] enviado para cita ${cita.id}`);
+      } catch (err) {
+        this.logger.error(`Error recordatorio cita ${cita.id}: ${err.message}`);
+      }
+    }
+
+    this.logger.log('✅ Tarea de recordatorios completada');
+  }
 
     //Método para obtener los usuarios con el rol 'client'
     async getAllUsersWithVehicles(): Promise<
@@ -426,11 +562,10 @@ export class AppointmentService {
     }
 
     async updateAppointmentStatusAndDetails(
-        appointmentId: number,
-        updateData: UpdateAppointmentDto
-    ): Promise<AppointmentEntity> {
-        console.log('📩 Datos recibidos para actualizar:', updateData);
-
+  appointmentId: number,
+  updateData: UpdateAppointmentDto
+): Promise<AppointmentEntity> {
+  console.log('📩 Datos recibidos para actualizar:', updateData);
         const appointment = await this.appointmentRepository.findOne({
             where: {
                 id: appointmentId,
@@ -491,8 +626,22 @@ export class AppointmentService {
             estado: savedAppointment.estado,
         });
 
-        return savedAppointment;
-    }
+  // Notificación de confirmación (normalizando estado a minúsculas)
+  if (
+    savedAppointment.estado.toLowerCase() === 'confirmada' &&
+    savedAppointment.cliente?.fcm_token
+  ) {
+    await this.notificationService.sendNotificationToSmartwatch({
+      title: 'Cita confirmada',
+      message: `Tu cita para ${savedAppointment.fecha} a las ${savedAppointment.hora} ha sido confirmada.`,
+      citaId: savedAppointment.id,
+      tipo: 'aceptada',
+      token: savedAppointment.cliente.fcm_token,
+    });
+  }
+
+  return savedAppointment;
+}
 
 
     async updateAppointmentIfConfirmed(
@@ -537,6 +686,18 @@ export class AppointmentService {
         const savedAppointment = await this.appointmentRepository.save(appointment);
 
         console.log('✅ Cita actualizada y guardada:', savedAppointment);
+
+        //empieza notificacion
+        if (savedAppointment.estado === 'cancelada' && appointment.cliente?.fcm_token) {
+            await this.notificationService.sendNotificationToSmartwatch({
+                title: 'Cita cancelada',
+                message: `Tu cita del ${appointment.fecha} ha sido cancelada.`,
+                citaId: savedAppointment.id,
+                tipo: 'cancelada',
+                token: appointment.cliente.fcm_token,
+            });
+        }
+        //termina
 
         return savedAppointment;
     }
@@ -626,6 +787,19 @@ export class AppointmentService {
 
         const savedRejection = await this.appointmentRejectionRepository.save(rejection);
 
+        if (appointment.cliente?.fcm_token) {
+        const fecha = appointment.fecha; 
+        const hora = appointment.hora;  
+        const titulo = 'Cita rechazada';
+        const mensaje = `Tu cita del ${fecha} a las ${hora} ha sido rechazada. Motivo: ${data.motivo}`;
+        await this.notificationService.sendNotificationToSmartwatch({
+            title: titulo,
+            message: mensaje,
+            citaId: appointment.id,
+            tipo: 'rechazada',
+            token: appointment.cliente.fcm_token,
+        });
+    }
         // Enviar correo si el cliente tiene email
         if (appointment.cliente && appointment.cliente.correo) {
             await this.emailService.sendRejectionEmail(
@@ -642,4 +816,16 @@ export class AppointmentService {
         return savedRejection;
     }
 
+
+    //ESTE ES NUEVO PARA LAS NOTIFICACIOES
+      async getAppointmentEntityById(id: number): Promise<AppointmentEntity> {
+    const appointment = await this.appointmentRepository.findOne({
+      where: { id },
+      relations: ['cliente'],  // cargar el cliente para obtener fcm_token
+    });
+    if (!appointment) {
+      throw new NotFoundException(`Cita con ID ${id} no encontrada`);
+    }
+    return appointment;
+  }
 }

@@ -186,6 +186,5 @@ export class LoginService {
             token: token,  // Retorna el token generado
         });
 
-
     }
 }
