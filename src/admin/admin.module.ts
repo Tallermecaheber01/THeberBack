@@ -44,6 +44,7 @@ import { RepairClientViewEntity } from './accept-cash/view/repair-client-view.en
 import { AppointmentClient } from 'src/client/appointment-client/entity/appointment-client.entity';
 import { AppointmentServiceClient } from 'src/client/appointment-client/entity/appointment-client-service.entity';
 import { AppointmentCancellation } from 'src/client/appointment-client/entity/appointment-cancellation.entity';
+import { PerfilClientesEntity } from 'src/client/view/perfil_clientes.entity';
 
 //Views
 import { AppointmentWaitingViewEntity } from 'src/employ/entities-view/appointment_waiting_view';
@@ -92,7 +93,7 @@ import { QuizContact } from './quizContact/entities/quizContact.entity';
           CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
           RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
           AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, DemarcationEntity,
-          SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,
+          SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,PerfilClientesEntity
 
         ],
         synchronize: false,
@@ -106,7 +107,7 @@ import { QuizContact } from './quizContact/entities/quizContact.entity';
       CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
       RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
       AppointmentPendingChangeViewEntity,  SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, DemarcationEntity, 
-      SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact
+      SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,PerfilClientesEntity
 
     ]),
     JwtModule.register({

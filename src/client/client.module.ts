@@ -38,6 +38,10 @@ import { SmartwatchLinkEntity } from './smartwatch/smartwatch-link.entity';
 import {NotificationService} from './smartwatch/notification.service';
 import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appointment-reminder.entity'
 import { FeedbackEntity } from './feedback/entities/feedback.entity';
+import { VwPerfilClienteService } from './view/perfil_cliente.service';
+import { PerfilClientesEntity } from './view/perfil_clientes.entity';
+
+
 
 @Module({
   imports: [
@@ -55,7 +59,7 @@ import { FeedbackEntity } from './feedback/entities/feedback.entity';
         entities: [VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
           AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity,
           VehicleTypeEntity, BrandEntity,ServiceEntity, VwAppointmentDetails,RepairPaymentEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
-          SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity
+          SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, PerfilClientesEntity,
         ],
         synchronize: false,
       }),
@@ -64,7 +68,8 @@ import { FeedbackEntity } from './feedback/entities/feedback.entity';
     TypeOrmModule.forFeature([VehicleEntity, ClientEntity, AppointmentEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentServiceEntity,
       AppointmentCancellationEntity, AppointmentRejectionEntity, Contact, UserViewEntity, VehicleTypeEntity,RepairPaymentEntity,
       BrandEntity,VwAppointmentDetails,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
-       SmartwatchLinkEntity, BrandEntity, AppointmentReminderEntity,FeedbackEntity,
+       SmartwatchLinkEntity, AppointmentReminderEntity,FeedbackEntity,PerfilClientesEntity,
+
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -72,7 +77,8 @@ import { FeedbackEntity } from './feedback/entities/feedback.entity';
   ],
   controllers: [ClientController],
   providers: [ VehiclesService,LoggerService, AppointmentClientService, RepairPaymentService, HistoryRepairsService,
-    NotificationService, FeedbackService,
+    NotificationService, FeedbackService,VwPerfilClienteService,
+
   ],
   exports: [FeedbackService]
 })

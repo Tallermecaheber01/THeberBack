@@ -1,5 +1,5 @@
 
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Req, UseGuards, UsePipes, ValidationPipe, Logger ,ParseIntPipe  } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Req, UseGuards, UsePipes, ValidationPipe, Logger, ParseIntPipe } from '@nestjs/common';
 
 import { VehiclesService } from './vehicles/vehicles.service';
 
@@ -23,13 +23,14 @@ import { CreateCancellationDto } from './appointment-client/dto/create-cancellat
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
-import { NotificationService } from './smartwatch/notification.service'; 
+import { NotificationService } from './smartwatch/notification.service';
 import { LinkSmartwatchDto } from './smartwatch/comparate_token_smartwatch.dto';
 import { UnlinkSmartwatchDto } from './smartwatch/unlink-smartwatch.dto';
 import { FeedbackService } from './feedback/feedback.service';
 import { CreateFeedbackDto } from './feedback/dto/create-feedback.dto';
 import { FeedbackEntity } from './feedback/entities/feedback.entity';
-
+import { VwPerfilClienteService } from './view/perfil_cliente.service';
+import { PerfilClientesEntity } from './view/perfil_clientes.entity';
 
 @Controller('client')
 export class ClientController {
@@ -44,6 +45,10 @@ export class ClientController {
 
     private readonly notificationService: NotificationService,
     private readonly feedbackService: FeedbackService,
+    private readonly vwPerfilClienteService: VwPerfilClienteService,
+
+    @InjectRepository(PerfilClientesEntity)
+    private readonly perfilRepo: Repository<PerfilClientesEntity>,
   ) { }
 
   @Post('new-vehicle')
@@ -207,7 +212,7 @@ export class ClientController {
     const code = await this.notificationService.generarCodigoSmartwatch(user);
     return { code };
   }
-    @Post('vinculacion')
+  @Post('vinculacion')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async linkSmartwatch(@Body() dto: LinkSmartwatchDto): Promise<{ message: string }> {
     this.logger.log(`Petición de vinculación recibida con código: ${dto.code}`);
@@ -215,7 +220,7 @@ export class ClientController {
     return { message: 'Vinculación exitosa' };
   }
 
-    @Post('desvincular_smartwatch')
+  @Post('desvincular_smartwatch')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async unlinkSmartwatch(
     @Body() dto: UnlinkSmartwatchDto
@@ -235,14 +240,14 @@ export class ClientController {
   }
 
   // Obtiene todos los feedbacks
-   
+
   @Get('feedback')
   async getAllFeedback(): Promise<FeedbackEntity[]> {
     return await this.feedbackService.findAll();
   }
 
   //Obtiene un feedback por ID
-   
+
   @Get('feedback/:feedbackId')
   async getFeedbackById(
     @Param('feedbackId', ParseIntPipe) feedbackId: number
@@ -251,13 +256,23 @@ export class ClientController {
   }
 
   // Elimina un feedback por ID
-   
+
   @Delete('feedback/:feedbackId')
   async deleteFeedback(
     @Param('feedbackId', ParseIntPipe) feedbackId: number
   ): Promise<{ message: string }> {
     await this.feedbackService.remove(feedbackId);
     return { message: 'Feedback eliminado exitosamente' };
+  }
+
+  @Get('debug-perfil')
+  async debugPerfil(): Promise<PerfilClientesEntity[]> {
+    return await this.perfilRepo.find();
+  }
+
+  @Get('debug-perfil/:id')
+  async debugPerfilById(@Param('id') id: number): Promise<PerfilClientesEntity | null> {
+    return await this.perfilRepo.findOne({ where: { idCliente: id } });
   }
 
 }

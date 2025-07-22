@@ -23,6 +23,7 @@ import { ServiceEntity } from 'src/admin/service/entities/service.entity';
 import { LoggerService } from 'src/services/logger/logger.service';
 import {SmartwatchLinkEntity} from 'src/client/smartwatch/smartwatch-link.entity';
 import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appointment-reminder.entity'
+import { PerfilClientesEntity } from 'src/client/view/perfil_clientes.entity';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appoi
         database: configService.get<string>('DB_NAME'),
         entities: [ClientEntity, UserViewEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentEntity,
           AppointmentServiceEntity, AppointmentCancellationEntity, AppointmentRejectionEntity, VehicleEntity, Contact, ServiceEntity,SmartwatchLinkEntity,
-          AppointmentReminderEntity,
+          AppointmentReminderEntity,PerfilClientesEntity
         ],
         synchronize: false,
       }),
@@ -47,7 +48,7 @@ import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appoi
     }),
     TypeOrmModule.forFeature([ClientEntity, UserViewEntity, AuthorizedPersonnelEntity, QuestionSecretEntity, AppointmentEntity,
       AppointmentServiceEntity, AppointmentCancellationEntity, AppointmentRejectionEntity, VehicleEntity, Contact, ServiceEntity,SmartwatchLinkEntity,
-      AppointmentReminderEntity,
+      AppointmentReminderEntity,PerfilClientesEntity
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
