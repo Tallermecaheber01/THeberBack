@@ -19,7 +19,7 @@ export class NotificationService {
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(
-          'C:/Users/52771/Documents/Proyecto_Taller/THeberBack/src/client/smartwatch/keys/tallerheber-16566-firebase-adminsdk-fbsvc-1453744b20.json',
+          'C:/Users/yoloa/THeberBack-main/src/client/smartwatch/keys/tallerheber-16566-firebase-adminsdk-fbsvc-9dea63d6f1.json',
         ),
       });
     }

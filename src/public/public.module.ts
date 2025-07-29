@@ -24,6 +24,10 @@ import { LoggerService } from 'src/services/logger/logger.service';
 import {SmartwatchLinkEntity} from 'src/client/smartwatch/smartwatch-link.entity';
 import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appointment-reminder.entity'
 import { PerfilClientesEntity } from 'src/client/view/perfil_clientes.entity';
+import { UpdateInfoService } from './recover-password/actualizacionInfo/dto/update-info.service';
+import { EmployersService } from './recover-password/employers/employers.service';
+
+
 
 @Module({
   imports: [
@@ -56,7 +60,9 @@ import { PerfilClientesEntity } from 'src/client/view/perfil_clientes.entity';
     })
   ],
   controllers: [PublicController],
-  providers: [RegisterService, LoginService, RecoverPasswordService, InformationService, UnlockService, LoggerService]
+  providers: [RegisterService, LoginService, RecoverPasswordService, InformationService, UnlockService, LoggerService, UpdateInfoService,
+    EmployersService,
+  ]
 })
 export class PublicModule implements OnModuleInit{
   onModuleInit() {

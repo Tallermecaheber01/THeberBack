@@ -35,6 +35,9 @@ export class AuthorizedPersonnelEntity {
     @JoinColumn({ name: 'idPreguntaSecreta' })
     preguntaSecreta: QuestionSecretEntity
 
+    @Column({ type: 'varchar', length: 255 })
+    respuestaSecreta: string;
+
     // Nueva columna: estado (ENUM)
     @Column({ type: 'enum', enum: ['activo', 'bloqueado'], default: 'activo' })
     estado: 'activo' | 'bloqueado';
