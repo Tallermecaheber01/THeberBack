@@ -49,12 +49,12 @@ import { CreateFaqDto } from './FAQ/dto/create_FAQ.dto';
 import { UpdateFaqDto } from './FAQ/dto/update_FAQ.dto';
 import { DeleteFaqDto } from './FAQ/dto/delete_FAQ.dto';
 import { Faq } from './FAQ/entities/FAQ.entity';
-import { FaqService } from './FAQ/faq.service';
+import { FaqService } from './FAQ/FAQ.service';
 //quiz
 import { CreateQuizQuestionDto } from './quizQuestion/dto/create_quizQuestion.dto';
 import { UpdateQuizQuestionDto } from './quizQuestion/dto/update_quizQuestion.dto';
 import { DeleteQuizQuestionDto } from './quizQuestion/dto/delete_quizQuestion.dto';
-import { QuizQuestionService } from './quizQuestion/quizQuestion.service';
+import { QuizQuestionService } from './quizQuestion/quizQuestion.Service';
 import { QuizContactService } from './quizContact/quizContact.service';
 import { UpdateQuizContactDto } from './quizContact/dto/update_quizContac.dto';
 import { QuizContact } from './quizContact/entities/quizContact.entity';

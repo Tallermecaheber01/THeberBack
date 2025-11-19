@@ -16,8 +16,8 @@ import { FeedbackService } from 'src/client/feedback/feedback.service';
 import { FeedbackEntity } from 'src/client/feedback/entities/feedback.entity';
 import { DemarcationService } from './demarcation/demarcation.service';
 //faq
-import { FaqService } from './FAQ/faq.service';  // en minúsculas
-import { Faq } from './FAQ/entities/faq.entity';  // también minúsculas
+import { FaqService } from './FAQ/FAQ.service';  // en minúsculas
+import { Faq } from './FAQ/entities/FAQ.entity';  // también minúsculas
 
 
 //Entities
@@ -68,7 +68,7 @@ import { TermsService } from './terms/terms.service';
 //quiz
 import { QuizQuestionService } from './quizQuestion/quizQuestion.service';
 import { QuizQuestion } from './quizQuestion/entities/quizQuestion.entity';
-import { QuizContactService } from './quizContact/quizContact.service';
+import { QuizContactService } from './quizContact/quizContact.Service';
 import { QuizContact } from './quizContact/entities/quizContact.entity';
 
 //hola
