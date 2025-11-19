@@ -9,7 +9,7 @@ import { ClientModule } from './client/client.module';
 import { AdminModule } from './admin/admin.module';
 import { EmployModule } from './employ/employ.module';
 import { PublicModule } from './public/public.module';
-
+import { PushModule } from './push/push.module';
 // Entities
 import { ServiceEntity } from './admin/service/entities/service.entity';
 import { BrandEntity } from './admin/service/entities/brand.entity';
@@ -67,6 +67,7 @@ import { SmartwatchLinkEntity } from './client/smartwatch/smartwatch-link.entity
     EmployModule,
     PublicModule,
     MercadoPagoModule,
+    PushModule,
   ],
   controllers: [AppController],
   providers: [AppService],

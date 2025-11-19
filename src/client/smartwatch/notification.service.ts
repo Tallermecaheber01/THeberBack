@@ -1,21 +1,23 @@
-
 import * as admin from 'firebase-admin';
-import { Injectable, Logger, BadRequestException  } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SmartwatchLinkEntity } from './smartwatch-link.entity';
 import { ClientEntity } from 'src/public/recover-password/entity/client-entity';
 import { randomBytes } from 'crypto';
- 
+import { PushService } from 'src/push/push.service'; // 👈 importa tu servicio push
+
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
 
-  constructor( 
+  constructor(
     @InjectRepository(SmartwatchLinkEntity)
     private readonly linkRepository: Repository<SmartwatchLinkEntity>,
     @InjectRepository(ClientEntity)
-    private readonly clientRepository: Repository<ClientEntity>,) {
+    private readonly clientRepository: Repository<ClientEntity>,
+    private readonly pushService: PushService, // 👈 inyecta aquí
+  ) {
     if (!admin.apps.length) {
       admin.initializeApp({
         credential: admin.credential.cert(
@@ -25,34 +27,41 @@ export class NotificationService {
     }
   }
 
-async sendNotificationToSmartwatch(payload: {
-  title: string;
-  message: string;
-  citaId: number;
-  tipo: 'aceptada' | 'rechazada' | 'cancelada' | 'proxima' | 'finalizada';
-  token: string;
-}): Promise<void> {
-  const message: admin.messaging.Message = {
-    token: payload.token,
-    data: {
-      title: payload.title,
-      subtitle: payload.message,       // usar “subtitle” o “body” en data
-      citaId: payload.citaId.toString(),
-      tipo: payload.tipo,
-    },
-    android: {
-      priority: 'high',                // alta prioridad para entrega inmediata
-    },
-  };
+  async sendNotificationToSmartwatch(payload: {
+    title: string;
+    message: string;
+    citaId: number;
+    tipo: 'aceptada' | 'rechazada' | 'cancelada' | 'proxima' | 'finalizada';
+    token: string;
+  }): Promise<void> {
+    const message: admin.messaging.Message = {
+      token: payload.token,
+      data: {
+        title: payload.title,
+        subtitle: payload.message,
+        citaId: payload.citaId.toString(),
+        tipo: payload.tipo,
+      },
+      android: { priority: 'high' },
+    };
 
-  this.logger.log('📤 Payload (data-only) enviado a FCM:\n' + JSON.stringify(message, null, 2));
-  try {
-    const response = await admin.messaging().send(message);
-    this.logger.log('✅ Notificación enviada, response ID: ' + response);
-  } catch (error) {
-    this.logger.error('❌ Error al enviar notificación FCM: ' + error.message, error.stack);
+    this.logger.log('📤 Enviando notificación Firebase...');
+    try {
+      const response = await admin.messaging().send(message);
+      this.logger.log('✅ Notificación FCM enviada: ' + response);
+    } catch (error) {
+      this.logger.error('❌ Error al enviar FCM: ' + error.message);
+    }
+
+    // 🚀 Enviar también notificación web push
+    try {
+      this.logger.log('🌐 Enviando notificación web push...');
+      await this.pushService.sendNotification(payload.title, payload.message);
+      this.logger.log('✅ Notificación web push enviada');
+    } catch (error) {
+      this.logger.error('❌ Error enviando push web: ' + error.message);
+    }
   }
-}
 
 
   async generarCodigoSmartwatch(user: ClientEntity): Promise<string> {

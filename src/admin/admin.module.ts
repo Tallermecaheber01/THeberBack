@@ -71,7 +71,18 @@ import { QuizQuestion } from './quizQuestion/entities/quizQuestion.entity';
 import { QuizContactService } from './quizContact/quizContact.service';
 import { QuizContact } from './quizContact/entities/quizContact.entity';
 
-
+//hola
+import { Expense } from '../client/expenses/entities/expenses.entity';
+import { ExpensesService } from '../client/expenses/expenses.service';
+import { CreateExpenseDto } from '../client/expenses/dto/create-expenses.dto';
+import { UpdateExpenseDto } from '../client/expenses/dto/update-expenses.dto';
+import { DeleteExpenseDto } from '../client/expenses/dto/delete-expenses.dto';
+import { Category } from '../client/category/entity/category.entity';
+import { CategoryService } from '../client/category/category.service';
+import { PushModule } from 'src/push/push.module';
+import { PushController } from 'src/push/push.controller';
+import { PushService } from 'src/push/push.service';
+import { NotificationModule } from 'src/client/smartwatch/notification.module';
 
 @Module({
   imports: [
@@ -83,8 +94,8 @@ import { QuizContact } from './quizContact/entities/quizContact.entity';
         type: 'mysql',
         host: configService.get<string>('DB_HOST'),
         port: +configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME_ADMIN'),
-        password: configService.get<string>('DB_PASSWORD_ADMIN'),
+        username: configService.get('DB_USERNAME_ADMIN', process.env.DB_USERNAME_ADMIN),
+password: configService.get('DB_PASSWORD_ADMIN', process.env.DB_PASSWORD_ADMIN),
         database: configService.get<string>('DB_NAME'),
         entities: [ServiceEntity, BrandEntity, VehicleTypeEntity, CorporateImage, Contact,
           AppointmentWaitingViewEntity, AppointmentEntity, AppointmentCancellationEntity, AppointmentRejectionEntity,
@@ -93,7 +104,7 @@ import { QuizContact } from './quizContact/entities/quizContact.entity';
           CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
           RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
           AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, DemarcationEntity,
-          SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,PerfilClientesEntity
+          SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,PerfilClientesEntity,Expense, Category, 
 
         ],
         synchronize: false,
@@ -107,21 +118,26 @@ import { QuizContact } from './quizContact/entities/quizContact.entity';
       CancelledAppointmentsViewEntity, Police,VwAppointmentDetails,RepairPaymentEntity,Pago,StateRepairEntity,
       RepairClientViewEntity,VistaRepairsEmpleados,AppointmentClient,AppointmentServiceClient,AppointmentCancellation,
       AppointmentPendingChangeViewEntity,  SmartwatchLinkEntity, AppointmentReminderEntity, FeedbackEntity, DemarcationEntity, 
-      SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,PerfilClientesEntity
+      SecurityPolicyEntity, TermsEntity, Faq, QuizQuestion, QuizContact,PerfilClientesEntity, Expense, Category
+      
 
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { /*expiresIn: '1h'*/ },
-    })
+      signOptions: { /*expiresIn: '1h'*/ }, 
+    }),
+    PushModule,
   ],
   controllers: [AdminController],
   providers: [ServiceService, ContactService, CorporateimageService, PoliceService,LoggerService, AcceptCashService, NotificationService, FeedbackService,  DemarcationService,
-    SecurityPolicyService, TermsService, FaqService,  QuizQuestionService, QuizContactService,],
-  exports: [ServiceService, CorporateimageService, FaqService, QuizQuestionService, QuizContactService,], // Exporta si se necesita en otros módulos
+    SecurityPolicyService, TermsService, FaqService,  QuizQuestionService, QuizContactService, ExpensesService, CategoryService, ],
+  exports: [ServiceService, CorporateimageService, FaqService, QuizQuestionService, QuizContactService, ExpensesService, CategoryService, ], // Exporta si se necesita en otros módulos
 })
+
+
 export class AdminModule implements OnModuleInit {
   onModuleInit() {
     console.log('Modulo admin en uso')
+    
   }
 }

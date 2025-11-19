@@ -36,6 +36,14 @@ import { UserVehicleViewEntity } from './entities-view/user-vehicle.view.entity'
 import { CancelledAppointmentsViewEntity } from './entities-view/appointments_cancelled_view';
 import { AppointmentWaitingViewEntity } from './entities-view/appointment_waiting_view';
 import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_change_view';
+//hola
+import { Expense } from '../client/expenses/entities/expenses.entity';
+import { ExpensesService } from '../client/expenses/expenses.service';
+import { CreateExpenseDto } from '../client/expenses/dto/create-expenses.dto';
+import { UpdateExpenseDto } from '../client/expenses/dto/update-expenses.dto';
+import { DeleteExpenseDto } from '../client/expenses/dto/delete-expenses.dto';
+import { Category } from '../client/category/entity/category.entity';
+import { CategoryService } from '../client/category/category.service';
 
 @Module({
   imports: [
@@ -54,7 +62,7 @@ import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_
           AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
           CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
           AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity,
-          PerfilClientesEntity
+          PerfilClientesEntity, Expense, Category
 
         ],
         synchronize: false,
@@ -66,7 +74,7 @@ import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_
       AppointmentServiceEntity, AppointmentServicesViewEntity, RepairEntity, AppointmentCancellationEntity,
       CancelledAppointmentsViewEntity, AuthorizedPersonnelEntity, ClientEntity, AppointmentWaitingViewEntity,
       AppointmentRejectionEntity, VehicleEntity, QuestionSecretEntity, Contact, AppointmentPendingChangeViewEntity, SmartwatchLinkEntity, AppointmentReminderEntity,
-      PerfilClientesEntity
+      PerfilClientesEntity, Expense, Category
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -75,7 +83,7 @@ import { AppointmentPendingChangeViewEntity } from './entities-view/appointment_
     NotificationModule,
   ],
   controllers: [EmployController],
-  providers: [AppointmentService, RepairService, LoggerService,EmailService],
+  providers: [AppointmentService, RepairService, LoggerService,EmailService, ExpensesService, CategoryService],
   exports: [AppointmentService]
 })
 export class EmployModule implements OnModuleInit {

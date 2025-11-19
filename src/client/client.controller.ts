@@ -1,4 +1,3 @@
-
 import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Put, Req, UseGuards, UsePipes, ValidationPipe, Logger, ParseIntPipe } from '@nestjs/common';
 
 import { VehiclesService } from './vehicles/vehicles.service';
@@ -31,6 +30,15 @@ import { CreateFeedbackDto } from './feedback/dto/create-feedback.dto';
 import { FeedbackEntity } from './feedback/entities/feedback.entity';
 import { VwPerfilClienteService } from './view/perfil_cliente.service';
 import { PerfilClientesEntity } from './view/perfil_clientes.entity';
+import { ExpensesService } from './expenses/expenses.service';
+import { CreateExpenseDto } from './expenses/dto/create-expenses.dto';
+import { UpdateExpenseDto } from './expenses/dto/update-expenses.dto';
+import { DeleteExpenseDto } from './expenses/dto/delete-expenses.dto';
+import { Expense } from './expenses/entities/expenses.entity';
+// al resto de imports ya existentes
+import { CategoryService } from './category/category.service';
+import { Category } from './category/entity/category.entity';
+
 
 @Controller('client')
 export class ClientController {
@@ -49,6 +57,10 @@ export class ClientController {
 
     @InjectRepository(PerfilClientesEntity)
     private readonly perfilRepo: Repository<PerfilClientesEntity>,
+    private readonly expensesService: ExpensesService,
+    @InjectRepository(Expense)
+    private readonly expenseRepository: Repository<Expense>,
+    private readonly categoryService: CategoryService,
   ) { }
 
   @Post('new-vehicle')
@@ -274,6 +286,96 @@ export class ClientController {
   async debugPerfilById(@Param('id') id: number): Promise<PerfilClientesEntity | null> {
     return await this.perfilRepo.findOne({ where: { idCliente: id } });
   }
+
+  // Crear un gasto
+  @Post('expenses')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async createExpense(
+    @Req() req: any,
+    @Body() createExpenseDto: CreateExpenseDto,
+  ): Promise<Expense> {
+    this.logger.log('Datos recibidos para gasto: ' + JSON.stringify(createExpenseDto));
+    const idCliente = req.user?.userId;
+    this.logger.log('ID cliente: ' + idCliente);
+
+    if (!idCliente) {
+      throw new BadRequestException('No se encontró ID del cliente');
+    }
+
+    try {
+      const gasto = await this.expensesService.crear({ ...createExpenseDto, idCliente });
+      this.logger.log('Gasto creado: ' + JSON.stringify(gasto));
+      return gasto;
+    } catch (error) {
+      this.logger.error('Error creando gasto', error);
+      throw new BadRequestException(error.message);
+    }
+  }
+
+
+  // Obtener todos los gastos del cliente
+  @Get('expenses')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async getExpenses(@Req() req: any): Promise<Expense[]> {
+    const idCliente = req.user?.userId;
+    return this.expensesService.obtenerPorCliente(idCliente);
+  }
+
+  // Actualizar un gasto
+  @Patch('expenses/:id')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async updateExpense(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateExpenseDto: UpdateExpenseDto,
+    @Req() req: any,
+  ): Promise<Expense> {
+    const idCliente = req.user?.userId;
+    // Opcional: verificar que el gasto pertenece al cliente antes de actualizar
+    const expense = await this.expensesService.obtenerPorCliente(idCliente);
+    const existe = expense.find(e => e.id === id);
+    if (!existe) {
+      throw new NotFoundException('Gasto no encontrado o no pertenece al cliente');
+    }
+
+    return this.expensesService.actualizar(id, updateExpenseDto);
+  }
+
+  // Eliminar un gasto
+  @Delete('expenses/:id')
+  @Roles('cliente')
+  @UseGuards(AuthGuard, RoleGuard)
+  async deleteExpense(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: any,
+  ): Promise<{ message: string }> {
+    const idCliente = req.user?.userId;
+    const expenses = await this.expensesService.obtenerPorCliente(idCliente);
+    const existe = expenses.find(e => e.id === id);
+    if (!existe) {
+      throw new NotFoundException('Gasto no encontrado o no pertenece al cliente');
+    }
+
+    await this.expensesService.eliminar(id);
+    return { message: 'Gasto eliminado exitosamente' };
+  }
+
+  // Obtener todas las categorías
+@Get('category')
+async getAllCategories(): Promise<Category[]> {
+  return this.categoryService.findAll();
+}
+
+// Obtener categoría por id
+@Get('category/:id')
+async getCategoryById(@Param('id', ParseIntPipe) id: number): Promise<Category> {
+  const cat = await this.categoryService.findById(id);
+  if (!cat) throw new NotFoundException('Categoría no encontrada');
+  return cat;
+}
+
 
 }
 

@@ -26,8 +26,8 @@ import { AppointmentReminderEntity } from 'src/employ/appointment/entities/appoi
 import { PerfilClientesEntity } from 'src/client/view/perfil_clientes.entity';
 import { UpdateInfoService } from './recover-password/actualizacionInfo/dto/update-info.service';
 import { EmployersService } from './recover-password/employers/employers.service';
-
-
+import { PushController } from 'src/push/push.controller';
+import { PushService } from 'src/push/push.service';
 
 @Module({
   imports: [
@@ -60,7 +60,7 @@ import { EmployersService } from './recover-password/employers/employers.service
     })
   ],
   controllers: [PublicController],
-  providers: [RegisterService, LoginService, RecoverPasswordService, InformationService, UnlockService, LoggerService, UpdateInfoService,
+  providers: [RegisterService, LoginService, RecoverPasswordService, InformationService, UnlockService, LoggerService, UpdateInfoService, PushService,
     EmployersService,
   ]
 })

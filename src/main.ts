@@ -50,6 +50,7 @@ async function bootstrap() {
     origin: [
       'https://therberfront.onrender.com', // Frontend en producción
       'http://localhost:3001',
+      'http://localhost:52419',
       'https://wheat-starling-827872.hostingersite.com'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -89,9 +90,10 @@ async function bootstrap() {
     await app.listen(3000);
     //throw new Error('¡Error de prueba!');
     logger.log('La aplicación se ha arrancado wui', 'Bootstrap'); // Usando log en lugar de console.log
-  } catch (error) {
-    logger.error('La aplicación no se ha arrancado debido a un error', { file: 'main.ts', line: 66 });
-  }
+    } catch (error) {
+  logger.error('La aplicación no se ha arrancado debido a un error', error);
+}
+
 
 }
 
