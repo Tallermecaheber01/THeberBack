@@ -5,15 +5,23 @@ import helmet from 'helmet';
 import * as fs from 'fs'; // <-- Añadir
 import { LoggerService } from './services/logger/logger.service';
 
-async function bootstrap() {
-  const httpsOptions = {
+let httpsOptions = undefined;
+
+if (process.env.NODE_ENV === 'production') {
+  // En Render NO usarás HTTPS local, Render ya provee HTTPS externo
+  httpsOptions = undefined;
+} else {
+  httpsOptions = {
     key: fs.readFileSync('certs/key.pem'),
     cert: fs.readFileSync('certs/cert.pem'),
   };
-  const app = await NestFactory.create(AppModule, {
-    //httpsOptions,
-    logger: new LoggerService()
-  });
+}
+
+ const app = await NestFactory.create(AppModule, {
+  httpsOptions,
+  logger: new LoggerService(),
+});
+
 
   // A05 & A09: Seguridad global con Helmet (se recomienda aplicar antes de cualquier otra cosa)
   app.use(helmet());
