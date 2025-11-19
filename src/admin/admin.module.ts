@@ -66,9 +66,9 @@ import { TermsEntity } from './terms/entities/terms.entity';
 import { TermsService } from './terms/terms.service';
 
 //quiz
-import { QuizQuestionService } from './quizQuestion/quizQuestion.service';
+import { QuizQuestionService } from './quizQuestion/quizQuestion.Service';
 import { QuizQuestion } from './quizQuestion/entities/quizQuestion.entity';
-import { QuizContactService } from './quizContact/quizContact.Service';
+import { QuizContactService } from './quizContact/quizContact.service';
 import { QuizContact } from './quizContact/entities/quizContact.entity';
 
 //hola
