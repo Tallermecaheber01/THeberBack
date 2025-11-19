@@ -86,11 +86,10 @@ async function bootstrap() {
 
   const logger = app.get(LoggerService);
 
-  try {
-    await app.listen(3000);
-    //throw new Error('¡Error de prueba!');
-    logger.log('La aplicación se ha arrancado wui', 'Bootstrap'); // Usando log en lugar de console.log
-    } catch (error) {
+ try {
+  await app.listen(process.env.PORT || 3000);
+  logger.log('La aplicación se ha arrancado wui', 'Bootstrap');
+} catch (error) {
   logger.error('La aplicación no se ha arrancado debido a un error', error);
 }
 
