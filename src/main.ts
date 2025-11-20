@@ -53,8 +53,10 @@ async function bootstrap() {
     origin: [
       "https://therberfront.onrender.com",
       "http://localhost:3001",
+      "http://localhost:3000",
       "http://localhost:52419",
       "https://wheat-starling-827872.hostingersite.com",
+      "https://buildpwa.onrender.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -68,6 +70,9 @@ async function bootstrap() {
       'https://therberfront.onrender.com',
       'http://localhost:3001',
       'https://wheat-starling-827872.hostingersite.com',
+      'https://buildpwa.onrender.com',
+      'http://localhost:3000',
+      
     ];
 
     const origin = req.headers.origin;
